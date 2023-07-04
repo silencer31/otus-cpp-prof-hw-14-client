@@ -10,7 +10,7 @@ CONFIG += c++17
 
 win32 {
 # my win32 specifics
-    INCLUDEPATH += D:\Boost\Shared\include\boost-1_80
+    INCLUDEPATH += D:\Boost\Shared\include\boost-1_82
     LIBS += "-LD:\Boost\Shared\lib"
 } else {
 # All other platforms.
