@@ -1,6 +1,8 @@
 #include "netcommunication.h"
 
-NetCommunication::NetCommunication()
+NetCommunication::NetCommunication(const std::string& ip_addr, int port) :
+    _end_point(ba::ip::tcp::endpoint(ba::ip::address::from_string(ip_addr), port)),
+    _sock(ba::ip::tcp::socket(_io_context))
 {
 
 }
@@ -10,7 +12,7 @@ bool NetCommunication::connect_to_server()
     bool result = false;
 
     try {
-        _sock.connect(_ep);
+        _sock.connect(_end_point);
         result = true;
     }
     catch(const boost::system::system_error& ex) {

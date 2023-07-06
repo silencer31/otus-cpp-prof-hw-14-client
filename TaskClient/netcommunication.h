@@ -8,7 +8,7 @@ namespace ba = boost::asio;
 class NetCommunication
 {
 public:
-    NetCommunication();
+    explicit NetCommunication(const std::string& ip_addr, int port);
 
     bool connect_to_server();
 
@@ -17,10 +17,10 @@ public:
 private:
     std::string last_error;
 
-    ba::io_context _io_context;
-    ba::ip::tcp::endpoint _ep = ba::ip::tcp::endpoint(ba::ip::address::from_string("127.0.0.1"), 2023);
+    ba::ip::tcp::endpoint _end_point;
 
-    ba::ip::tcp::socket _sock = ba::ip::tcp::socket(_io_context);
+    ba::io_context _io_context;
+    ba::ip::tcp::socket _sock;
 };
 
 #endif // NETCOMMUNICATION_H
