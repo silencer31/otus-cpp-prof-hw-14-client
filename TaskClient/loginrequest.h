@@ -15,6 +15,10 @@ public:
     explicit LoginRequest(QWidget *parent = nullptr);
     ~LoginRequest();
 
+    void get_login_and_password(std::string& login, std::string& password);
+
+    void clear_fields();
+
 private:
     Ui::LoginRequest *ui;
 };

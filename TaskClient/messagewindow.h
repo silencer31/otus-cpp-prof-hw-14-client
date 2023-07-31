@@ -1,6 +1,8 @@
 #ifndef MESSAGEWINDOW_H
 #define MESSAGEWINDOW_H
 
+#pragma once
+
 #include <QDialog>
 
 namespace Ui {

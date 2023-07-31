@@ -31,7 +31,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="loginLineEdit">
    <property name="geometry">
     <rect>
      <x>16</x>
@@ -59,7 +59,7 @@
     </size>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
+  <widget class="QLineEdit" name="passwordLineEdit">
    <property name="geometry">
     <rect>
      <x>16</x>

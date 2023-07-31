@@ -14,6 +14,18 @@ LoginRequest::LoginRequest(QWidget *parent) :
     connect(ui->pbCancel,  SIGNAL(clicked(bool)), this, SLOT(reject()) );
 }
 
+void LoginRequest::get_login_and_password(std::string& login, std::string& password)
+{
+    login = ui->loginLineEdit->text().toStdString();
+    password = ui->passwordLineEdit->text().toStdString();
+}
+
+void LoginRequest::clear_fields()
+{
+    ui->loginLineEdit->clear();
+    ui->passwordLineEdit->clear();
+}
+
 LoginRequest::~LoginRequest()
 {
     delete ui;

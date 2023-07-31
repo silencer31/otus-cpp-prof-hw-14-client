@@ -23,14 +23,17 @@ SOURCES += \
     messagewindow.cpp \
     netcommunication.cpp \
     operatorwindow.cpp \
+    requestmanager.cpp \
     userwindow.cpp
 
 HEADERS += \
     adminwindow.h \
+    data_types.h \
     loginrequest.h \
     messagewindow.h \
     netcommunication.h \
     operatorwindow.h \
+    requestmanager.h \
     userwindow.h
 
 FORMS += \
