@@ -1,7 +1,7 @@
 #include "requestmanager.h"
 
-RequestManager::RequestManager(const net_communication_ptr nc_ptr) :
-    net_comm_ptr(nc_ptr)
+RequestManager::RequestManager(const net_comm_shared nc_ptr) :
+    net_communication_ptr(nc_ptr)
 {
 
 }

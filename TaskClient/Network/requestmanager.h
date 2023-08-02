@@ -21,7 +21,7 @@ public:
     bool login_on_server(const std::string& login, const std::string& password);
 
 private:
-    net_comm_shared net_comm_ptr;
+    net_comm_shared net_communication_ptr;
 };
 
 using req_mngr_shared = std::shared_ptr<RequestManager>;
