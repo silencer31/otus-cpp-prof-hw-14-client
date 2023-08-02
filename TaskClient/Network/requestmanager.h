@@ -16,14 +16,14 @@ class RequestManager
 public:
     RequestManager() = delete;
 
-    explicit RequestManager(const net_communication_ptr nc_ptr);
+    explicit RequestManager(const net_comm_shared nc_ptr);
 
     bool login_on_server(const std::string& login, const std::string& password);
 
 private:
-    net_communication_ptr net_comm_ptr;
+    net_comm_shared net_comm_ptr;
 };
 
-using request_manager_ptr = std::shared_ptr<RequestManager>;
+using req_mngr_shared = std::shared_ptr<RequestManager>;
 
 #endif // REQUESTMANAGER_H

@@ -33,6 +33,6 @@ private:
     ba::ip::tcp::socket _sock;
 };
 
-using net_communication_ptr = std::shared_ptr<NetCommunication>;
+using net_comm_shared = std::shared_ptr<NetCommunication>;
 
 #endif // NETCOMMUNICATION_H

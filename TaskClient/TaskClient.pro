@@ -17,31 +17,32 @@ win32 {
 }
 
 SOURCES += \
-    loginrequest.cpp \
     main.cpp \
-    adminwindow.cpp \
-    messagewindow.cpp \
-    netcommunication.cpp \
-    operatorwindow.cpp \
-    requestmanager.cpp \
-    userwindow.cpp
+    Windows\adminwindow.cpp \
+    Windows\loginrequest.cpp \
+    Windows\messagewindow.cpp \
+    Windows\operatorwindow.cpp \
+    Windows\userwindow.cpp \
+    Network\netcommunication.cpp \
+    Network\requestmanager.cpp \
+
 
 HEADERS += \
-    adminwindow.h \
-    data_types.h \
-    loginrequest.h \
-    messagewindow.h \
-    netcommunication.h \
-    operatorwindow.h \
-    requestmanager.h \
-    userwindow.h
+    Windows\adminwindow.h \
+    Windows\loginrequest.h \
+    Windows\messagewindow.h \
+    Windows\operatorwindow.h \
+    Windows\userwindow.h \
+    Network\netcommunication.h \
+    Network\requestmanager.h \
+    data_types.h
 
 FORMS += \
-    adminwindow.ui \
-    loginrequest.ui \
-    messagewindow.ui \
-    operatorwindow.ui \
-    userwindow.ui
+    Forms\adminwindow.ui \
+    Forms\loginrequest.ui \
+    Forms\messagewindow.ui \
+    Forms\operatorwindow.ui \
+    Forms\userwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 #include "messagewindow.h"
-#include "requestmanager.h"
+#include "Network/requestmanager.h"
 
 namespace Ui {
 class OperatorWindow;
@@ -15,7 +15,7 @@ class OperatorWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit OperatorWindow(const request_manager_ptr rm_ptr, QWidget *parent = nullptr);
+    explicit OperatorWindow(const req_mngr_shared rm_ptr, QWidget *parent = nullptr);
     ~OperatorWindow();
 
     void set_message_window(const QSharedPointer<MessageWindow> mwp) {
@@ -25,7 +25,7 @@ public:
 private:
     Ui::OperatorWindow *ui;
 
-    request_manager_ptr req_man_ptr;
+    req_mngr_shared request_manager_ptr;
     QSharedPointer<MessageWindow> message_win_ptr;
 };
 

@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 #include "messagewindow.h"
-#include "requestmanager.h"
+#include "Network/requestmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AdminWindow; }
@@ -15,7 +15,7 @@ class AdminWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    AdminWindow(const request_manager_ptr rm_ptr, QWidget *parent = nullptr);
+    AdminWindow(const req_mngr_shared rm_ptr, QWidget *parent = nullptr);
 
     ~AdminWindow();
 
@@ -26,7 +26,7 @@ public:
 private:
     Ui::AdminWindow *ui;
 
-    request_manager_ptr req_man_ptr;
+    req_mngr_shared request_manager_ptr;
     QSharedPointer<MessageWindow> message_win_ptr;
 };
 #endif // ADMINWINDOW_H

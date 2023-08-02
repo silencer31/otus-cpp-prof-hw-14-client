@@ -1,12 +1,12 @@
-#include "netcommunication.h"
-#include "requestmanager.h"
+#include "Network/netcommunication.h"
+#include "Network/requestmanager.h"
 
-#include "messagewindow.h"
-#include "adminwindow.h"
-#include "operatorwindow.h"
+#include "Windows/messagewindow.h"
+#include "Windows/adminwindow.h"
+#include "Windows/operatorwindow.h"
 
-#include "userwindow.h"
-#include "loginrequest.h"
+#include "Windows/userwindow.h"
+#include "Windows/loginrequest.h"
 
 
 #include <QApplication>
@@ -19,20 +19,20 @@ int main(int argc, char *argv[])
     int server_port = 2019;
 
     // Объект для сетевого взаимодействия.
-    net_communication_ptr net_comm_ptr = std::make_shared<NetCommunication>(server_addr, server_port);
+    net_comm_shared net_communication_ptr = std::make_shared<NetCommunication>(server_addr, server_port);
 
     // Менеджер запросов к серверу.
-    request_manager_ptr req_man_ptr = std::make_shared<RequestManager>(net_comm_ptr);
+    req_mngr_shared request_manager_ptr = std::make_shared<RequestManager>(net_communication_ptr);
 
     QSharedPointer<MessageWindow> message_window_ptr(new MessageWindow());  // Окно для показа сообщений.
 
-    AdminWindow    admin_window(req_man_ptr);    // Окно для задач администратора.
+    AdminWindow    admin_window(request_manager_ptr);    // Окно для задач администратора.
     admin_window.set_message_window(message_window_ptr);
 
-    OperatorWindow operator_window(req_man_ptr); // Окно для задач оператора базы данных
+    OperatorWindow operator_window(request_manager_ptr); // Окно для задач оператора базы данных
     operator_window.set_message_window(message_window_ptr);
 
-    UserWindow     user_window(req_man_ptr);     // Окно для задач обычного пользователя.
+    UserWindow     user_window(request_manager_ptr);     // Окно для задач обычного пользователя.
     user_window.set_message_window(message_window_ptr);
 
     LoginRequest   login_window;    // Окно для входа в систему.
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
         login_window.get_login_and_password(login, password);
 
-        if ( req_man_ptr->login_on_server(login, password) ) {
+        if ( request_manager_ptr->login_on_server(login, password) ) {
             break;
         }
 

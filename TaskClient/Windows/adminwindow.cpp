@@ -1,10 +1,10 @@
 #include "adminwindow.h"
 #include "ui_adminwindow.h"
 
-AdminWindow::AdminWindow(const request_manager_ptr rm_ptr, QWidget *parent)
+AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AdminWindow)
-    , req_man_ptr(rm_ptr)
+    , request_manager_ptr(rm_ptr)
 {
     ui->setupUi(this);
 
