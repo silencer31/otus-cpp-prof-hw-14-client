@@ -20,17 +20,30 @@ public:
 
     explicit NetCommunication(const std::string& ip_addr, int port);
 
+    ~NetCommunication();
+
     bool connect_to_server();
 
     bool send_message(const std::string& text);
 
+    bool is_connected() {
+        return connected;
+    }
+
+    const std::string& get_last_error() const {
+        return last_error;
+    }
+
 private:
+    ba::io_context _io_context;
+    ba::ip::tcp::endpoint _end_point;
+    ba::ip::tcp::socket _sock;
+
+    bool connected;
+
     std::string last_error;
 
-    ba::ip::tcp::endpoint _end_point;
-
-    ba::io_context _io_context;
-    ba::ip::tcp::socket _sock;
+    std::string answer;
 };
 
 using net_comm_shared = std::shared_ptr<NetCommunication>;

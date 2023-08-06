@@ -11,9 +11,14 @@
 
 #include <QApplication>
 
+#include <iostream>
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    // Окно для показа сообщений.
+    QSharedPointer<MessageWindow> message_window_ptr(new MessageWindow());
 
     std::string server_addr("127.0.0.1");
     int server_port = 2019;
@@ -21,21 +26,34 @@ int main(int argc, char *argv[])
     // Объект для сетевого взаимодействия.
     net_comm_shared net_communication_ptr = std::make_shared<NetCommunication>(server_addr, server_port);
 
+    // Проверка, удалось ли подключиться к серверу.
+    if (net_communication_ptr->is_connected()) {
+        std::cout << "Client connected to server. IP: " << server_addr << " Port: " << server_port << std::endl;
+    }
+    else {
+        std::cout << "Connection error: " << net_communication_ptr->get_last_error() << std::endl;
+        message_window_ptr->set_message(QString::fromStdString(net_communication_ptr->get_last_error()));
+        message_window_ptr->exec();
+        return 1;
+    }
+
     // Менеджер запросов к серверу.
     req_mngr_shared request_manager_ptr = std::make_shared<RequestManager>(net_communication_ptr);
 
-    QSharedPointer<MessageWindow> message_window_ptr(new MessageWindow());  // Окно для показа сообщений.
-
-    AdminWindow    admin_window(request_manager_ptr);    // Окно для задач администратора.
+    // Окно для задач администратора.
+    AdminWindow    admin_window(request_manager_ptr);
     admin_window.set_message_window(message_window_ptr);
 
-    OperatorWindow operator_window(request_manager_ptr); // Окно для задач оператора базы данных
+    // Окно для задач оператора базы данных.
+    OperatorWindow operator_window(request_manager_ptr);
     operator_window.set_message_window(message_window_ptr);
 
-    UserWindow     user_window(request_manager_ptr);     // Окно для задач обычного пользователя.
+    // Окно для задач обычного пользователя.
+    UserWindow     user_window(request_manager_ptr);
     user_window.set_message_window(message_window_ptr);
 
-    LoginRequest   login_window;    // Окно для входа в систему.
+    // Окно для входа в систему.
+    LoginRequest   login_window;
 
     // Получение логина и пароля от пользователя.
     for(;;) {
@@ -48,6 +66,10 @@ int main(int argc, char *argv[])
         std::string password;
 
         login_window.get_login_and_password(login, password);
+
+        if (login.empty() || password.empty()) {
+            continue;
+        }
 
         if ( request_manager_ptr->login_on_server(login, password) ) {
             break;
