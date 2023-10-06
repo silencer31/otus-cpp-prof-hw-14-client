@@ -24,4 +24,6 @@ private:
     Ui::MessageWindow *ui;
 };
 
+using message_win_shared = QSharedPointer<MessageWindow>;
+
 #endif // MESSAGEWINDOW_H

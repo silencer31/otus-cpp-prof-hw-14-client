@@ -15,18 +15,16 @@ class OperatorWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit OperatorWindow(const req_mngr_shared rm_ptr, QWidget *parent = nullptr);
+    explicit OperatorWindow(const req_mngr_shared rm_ptr, const message_win_shared mw_ptr, QWidget *parent = nullptr);
     ~OperatorWindow();
-
-    void set_message_window(const QSharedPointer<MessageWindow> mwp) {
-        message_win_ptr = mwp;
-    }
 
 private:
     Ui::OperatorWindow *ui;
 
-    req_mngr_shared request_manager_ptr;
-    QSharedPointer<MessageWindow> message_win_ptr;
+    const req_mngr_shared request_manager_ptr;
+    const message_win_shared message_window_ptr;
 };
+
+using operator_win_unique = QScopedPointer<OperatorWindow>;
 
 #endif // OPERATORWINDOW_H

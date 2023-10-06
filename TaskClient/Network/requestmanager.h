@@ -16,8 +16,8 @@ class RequestManager
 public:
     RequestManager() = delete;
 
-    explicit RequestManager(const net_comm_shared nc_ptr) :
-        net_communication_ptr(nc_ptr)
+    explicit RequestManager(const net_comm_shared nc_ptr)
+        : net_communication_ptr(nc_ptr)
     {}
 
     bool send_test() {
@@ -27,7 +27,7 @@ public:
     bool login_on_server(const std::string& login, const std::string& password);
 
 private:
-    net_comm_shared net_communication_ptr;
+    const net_comm_shared net_communication_ptr;
 };
 
 using req_mngr_shared = std::shared_ptr<RequestManager>;

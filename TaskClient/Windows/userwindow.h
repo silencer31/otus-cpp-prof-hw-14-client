@@ -15,18 +15,16 @@ class UserWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit UserWindow(const req_mngr_shared rm_ptr, QWidget *parent = nullptr);
+    explicit UserWindow(const req_mngr_shared rm_ptr, const message_win_shared mw_ptr, QWidget *parent = nullptr);
     ~UserWindow();
-
-    void set_message_window(const QSharedPointer<MessageWindow> mwp) {
-        message_win_ptr = mwp;
-    }
 
 private:
     Ui::UserWindow *ui;
 
-    req_mngr_shared request_manager_ptr;
-    QSharedPointer<MessageWindow> message_win_ptr;
+    const req_mngr_shared request_manager_ptr;
+    const message_win_shared message_window_ptr;
 };
+
+using user_win_unique = QScopedPointer<UserWindow>;
 
 #endif // USERWINDOW_H
