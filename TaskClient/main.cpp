@@ -40,6 +40,9 @@ int main(int argc, char *argv[])
     // Менеджер запросов к серверу.
     req_mngr_shared request_manager_ptr = std::make_shared<RequestManager>(net_communication_ptr);
 
+    // Отправляем тестовое сообщение на сервер.
+    request_manager_ptr->send_test();
+
     // Окно для задач администратора.
     AdminWindow    admin_window(request_manager_ptr);
     admin_window.set_message_window(message_window_ptr);

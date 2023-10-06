@@ -34,6 +34,10 @@ public:
         return last_error;
     }
 
+    const std::string& get_answer() const {
+        return answer;
+    }
+
 private:
     ba::io_context _io_context;
     ba::ip::tcp::endpoint _end_point;
@@ -43,7 +47,8 @@ private:
 
     std::string last_error;
 
-    std::string answer;
+    std::string answer; // Ответ сервера.
+    size_t answer_len;  // Длина ответа.
 };
 
 using net_comm_shared = std::shared_ptr<NetCommunication>;

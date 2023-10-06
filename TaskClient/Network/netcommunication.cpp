@@ -50,7 +50,12 @@ bool NetCommunication::send_message(const std::string& text)
             data[i] = 0;
         }
 
-        size_t len = _sock.read_some( ba::buffer(data) );
+        answer_len = _sock.read_some( ba::buffer(data) );
+
+        if (answer_len > 0) {
+            answer.reserve(answer_len);
+            answer.assign(data);
+        }
     }
     catch(const boost::system::system_error& ex) {
         last_error = std::string("boost exception: ") + ex.what();
