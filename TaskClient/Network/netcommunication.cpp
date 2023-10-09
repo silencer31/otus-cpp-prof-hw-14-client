@@ -1,8 +1,8 @@
 #include "netcommunication.h"
 
-NetCommunication::NetCommunication(const std::string& ip_addr, int port) :
-    _end_point(ba::ip::tcp::endpoint(ba::ip::address::from_string(ip_addr), port)),
-    _sock(ba::ip::tcp::socket(_io_context))
+NetCommunication::NetCommunication(const std::string& ip_addr, int port)
+    : _end_point(ba::ip::tcp::endpoint(ba::ip::address::from_string(ip_addr), port))
+    , _sock(ba::ip::tcp::socket(_io_context))
 {
     connected = connect_to_server();
 }
@@ -41,21 +41,15 @@ bool NetCommunication::connect_to_server()
 
 bool NetCommunication::send_message(const std::string& text)
 {
+    if (text.empty()) {
+        return false;
+    }
+
+    request_size = text.size();
+    bytes_written = 0;
+
     try {
-        ba::write(_sock, ba::buffer(text.data(), text.size()));
-
-        char data[1024]; // Буфер для ответа от сервера.
-
-        for( int i = 0; i<1024; ++i) {
-            data[i] = 0;
-        }
-
-        answer_len = _sock.read_some( ba::buffer(data) );
-
-        if (answer_len > 0) {
-            answer.reserve(answer_len);
-            answer.assign(data);
-        }
+        bytes_written = ba::write(_sock, ba::buffer(text.data(), text.size()));
     }
     catch(const boost::system::system_error& ex) {
         last_error = std::string("boost exception: ") + ex.what();
@@ -65,6 +59,45 @@ bool NetCommunication::send_message(const std::string& text)
         last_error = std::string("std exception: ") + ex.what();
         return false;
     }
+
+    // Проверяем, сколько байт удалось записать.
+    if (bytes_written == 0) {
+        last_error = "Zero bytes were written";
+        return false;
+    }
+
+    return true;
+}
+
+bool NetCommunication::read_answer()
+{
+    char data[1024]; // Буфер для ответа от сервера.
+
+    for( int i = 0; i<1024; ++i) {
+        data[i] = 0;
+    }
+
+    try {
+        answer_len = _sock.read_some( ba::buffer(data) );
+    }
+    catch(const boost::system::system_error& ex) {
+        last_error = std::string("boost exception: ") + ex.what();
+        return false;
+    }
+    catch(const std::exception& ex) {
+        last_error = std::string("std exception: ") + ex.what();
+        return false;
+    }
+
+    // Проверяем, сколько байт удалось прочитать.
+    if (answer_len == 0) {
+        last_error = "Zero bytes were read";
+        return false;
+    }
+
+    answer.clear();
+    answer.reserve(answer_len);
+    answer.assign(data);
 
     return true;
 }

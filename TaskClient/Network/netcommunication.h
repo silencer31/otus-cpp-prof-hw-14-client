@@ -22,18 +22,26 @@ public:
 
     ~NetCommunication();
 
+    // Подключаемся к серверу.
     bool connect_to_server();
 
-    bool send_message(const std::string& text);
-
-    bool is_connected() {
+    // Узнать, удалось ли подключиться.
+    bool is_connected() const {
         return connected;
     }
 
+    // Отправка сообщения.
+    bool send_message(const std::string& text);
+
+    // Чтение ответа от сервера.
+    bool read_answer();
+
+    // Ошибка, полученная в процессе сетевого взаимодействия.
     const std::string& get_last_error() const {
         return last_error;
     }
 
+    // Получить ответ от сервера.
     const std::string& get_answer() const {
         return answer;
     }
@@ -45,10 +53,13 @@ private:
 
     bool connected;
 
-    std::string last_error;
+    std::string last_error; // Ошибка, полученная в процессе сетевого взаимодействия.
+
+    std::size_t request_size;  // Размер данных в сетевом запросе.
+    std::size_t bytes_written; // Сколько байт удалось отправить.
 
     std::string answer; // Ответ сервера.
-    size_t answer_len;  // Длина ответа.
+    std::size_t answer_len;  // Длина ответа.
 };
 
 using net_comm_shared = std::shared_ptr<NetCommunication>;
