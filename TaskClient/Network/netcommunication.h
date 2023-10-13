@@ -30,8 +30,8 @@ public:
         return connected;
     }
 
-    // Отправка сообщения.
-    bool send_message(const std::string& text);
+    // Отправка сообщения/запроса на сервер.
+    bool send_message(const char* data_ptr, const std::size_t data_size);
 
     // Чтение ответа от сервера.
     bool read_answer();

@@ -26,9 +26,6 @@ int main(int argc, char *argv[])
     // Менеджер запросов к серверу.
     const req_mngr_shared request_manager_ptr = std::make_shared<RequestManager>(net_communication_ptr);
 
-    // Отправляем тестовое сообщение на сервер.
-    //request_manager_ptr->send_test();
-
     // Окно для показа сообщений.
     const message_win_shared message_window_ptr(new MessageWindow());
 
@@ -42,7 +39,7 @@ int main(int argc, char *argv[])
     const user_win_unique user_window_ptr(new UserWindow(request_manager_ptr, message_window_ptr));
 
     // Окно для входа в систему.
-    LoginRequest   login_window;
+    LoginRequest login_window;
 
     // Проверка, удалось ли подключиться к серверу.
     if (net_communication_ptr->is_connected()) {

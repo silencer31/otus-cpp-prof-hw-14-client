@@ -20,11 +20,11 @@ public:
         : net_communication_ptr(nc_ptr)
     {}
 
-    bool send_test() {
-        return net_communication_ptr->send_message("Test");
-    }
+    bool send_test();
 
     bool login_on_server(const std::string& login, const std::string& password);
+
+    bool shutdown_server(const int user_id, const std::string& password);
 
 private:
     const net_comm_shared net_communication_ptr;

@@ -22,6 +22,7 @@ NetCommunication::~NetCommunication()
     }
 }
 
+// Подключаемся к серверу.
 bool NetCommunication::connect_to_server()
 {
     try {
@@ -39,17 +40,19 @@ bool NetCommunication::connect_to_server()
     return true;
 }
 
-bool NetCommunication::send_message(const std::string& text)
+// Отправка сообщения/запроса на сервер.
+bool NetCommunication::send_message(const char* data_ptr, const std::size_t data_size)
 {
-    if (text.empty()) {
+    if (data_size == 0) {
+        last_error = std::string("Empty data to send");
         return false;
     }
 
-    request_size = text.size();
+    request_size = data_size;
     bytes_written = 0;
 
     try {
-        bytes_written = ba::write(_sock, ba::buffer(text.data(), text.size()));
+        bytes_written = ba::write(_sock, ba::buffer(data_ptr, data_size));
     }
     catch(const boost::system::system_error& ex) {
         last_error = std::string("boost exception: ") + ex.what();
@@ -69,6 +72,7 @@ bool NetCommunication::send_message(const std::string& text)
     return true;
 }
 
+// Чтение ответа от сервера.
 bool NetCommunication::read_answer()
 {
     char data[1024]; // Буфер для ответа от сервера.
