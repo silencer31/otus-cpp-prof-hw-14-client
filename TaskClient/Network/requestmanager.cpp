@@ -43,3 +43,15 @@ bool RequestManager::shutdown_server(const int user_id, const std::string& passw
 
     return net_communication_ptr->send_message(json_document.toJson().constData(), json_document.toJson().length());
 }
+
+bool RequestManager::closedown_session()
+{
+    QJsonDocument json_document;
+    QJsonObject   json_object;
+
+    json_object["command"] = QString("closedown");
+
+    json_document.setObject(json_object);
+
+    return net_communication_ptr->send_message(json_document.toJson().constData(), json_document.toJson().length());
+}

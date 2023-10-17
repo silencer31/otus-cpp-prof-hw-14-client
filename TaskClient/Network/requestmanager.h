@@ -26,6 +26,8 @@ public:
 
     bool shutdown_server(const int user_id, const std::string& password);
 
+    bool closedown_session();
+
 private:
     const net_comm_shared net_communication_ptr;
 };
