@@ -9,17 +9,7 @@ NetCommunication::NetCommunication(const std::string& ip_addr, int port)
 
 NetCommunication::~NetCommunication()
 {
-    if ( _sock.is_open() ) {
-
-        boost::system::error_code ignore;
-
-        _sock.shutdown(
-            boost::asio::ip::tcp::socket::shutdown_both,
-            ignore
-            );
-
-        _sock.close(ignore);
-    }
+    disconnect();
 }
 
 // Подключаемся к серверу.
@@ -38,6 +28,23 @@ bool NetCommunication::connect_to_server()
     }
 
     return true;
+}
+
+// Отключиться
+void NetCommunication::disconnect()
+{
+    if ( !_sock.is_open() ) {
+        return;
+    }
+
+    boost::system::error_code ignore;
+
+    _sock.shutdown(
+        boost::asio::ip::tcp::socket::shutdown_both,
+        ignore
+        );
+
+    _sock.close(ignore);
 }
 
 // Отправка сообщения/запроса на сервер.

@@ -19,11 +19,17 @@ public:
 
     ~AdminWindow();
 
+    void set_id(int id) {
+        own_id = id;
+    }
+
 private:
     Ui::AdminWindow *ui;
 
     const req_mngr_shared request_manager_ptr;
     const message_win_shared message_window_ptr;
+
+    int own_id;
 };
 
 using admin_win_unique = QScopedPointer<AdminWindow>;

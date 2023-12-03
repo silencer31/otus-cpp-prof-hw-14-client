@@ -4,6 +4,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <string>
 
 namespace ba = boost::asio;
 
@@ -24,6 +25,9 @@ public:
 
     // Подключаемся к серверу.
     bool connect_to_server();
+
+    // Отключиться
+    void disconnect();
 
     // Узнать, удалось ли подключиться.
     bool is_connected() const {
@@ -62,6 +66,6 @@ private:
     std::size_t answer_len;  // Длина ответа.
 };
 
-using net_comm_shared = std::shared_ptr<NetCommunication>;
+using net_comm_unique = std::unique_ptr<NetCommunication>;
 
 #endif // NETCOMMUNICATION_H

@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,6 +17,8 @@ win32 {
 }
 
 SOURCES += \
+    Data/collector.cpp \
+    Parser/replyparser.cpp \
     main.cpp \
     Windows\adminwindow.cpp \
     Windows\loginrequest.cpp \
@@ -28,14 +30,18 @@ SOURCES += \
 
 
 HEADERS += \
+    Data/collector.h \
+    Data/data_collections.h \
+    Data/data_types.h \
+    Parser/replyparser.h \
     Windows\adminwindow.h \
     Windows\loginrequest.h \
     Windows\messagewindow.h \
     Windows\operatorwindow.h \
     Windows\userwindow.h \
     Network\netcommunication.h \
-    Network\requestmanager.h \
-    data_types.h
+    Network\requestmanager.h
+
 
 FORMS += \
     Forms\adminwindow.ui \
