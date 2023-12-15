@@ -87,38 +87,26 @@ public:
     QVector<int>::const_iterator int_array_cie();
 
 
-    /// Коллекция с вектором с числами и вектором строк.
-    // Подготовить вектор с числами и строками для заполнения.
-    void prepare_int_str_array(const int size);
+    /// Коллекция с числами и строками.
+    // Подготовить коллекцию с числами и строками для заполнения.
+    void prepare_int_str_map(const int size);
 
     // Добавить число и строку.
-    void int_str_array_push_back(const int value, const QString& str_value);
+    void int_str_map_push_back(const int value, const QString& str_value);
 
-    // Получить число по индексу.
-    int get_isa_number_by_index(const int index);
+    // Константный итератор на начало коллекции.
+    QMap<int, QString>::const_iterator int_str_map_str_cib();
 
-    // Получить число по индексу.
-    QString get_isa_string_by_index(const int index);
-
-    // Константный итератор на начало массива с числами.
-    QVector<int>::const_iterator int_str_array_int_cib();
-
-    // Константный итератор на конец массива с числами.
-    QVector<int>::const_iterator int_str_array_int_cie();
-
-    // Константный итератор на начало массива со строками.
-    QVector<QString>::const_iterator int_str_array_str_cib();
-
-    // Константный итератор на конец массива со строками.
-    QVector<QString>::const_iterator int_str_array_str_cie();
+    // Константный итератор на конец коллекции.
+    QMap<int, QString>::const_iterator int_str_map_str_cie();
 
 private:
     ReplyResult  reply_result;
     Login        login;
     Fullname     fullname;
     TaskData     task_data;
-    IntArray     int_array;
-    IntStrArrays int_str_arrays;
+    IntArray     int_array;     // get : userlist, tasklist
+    IntStrMap    int_str_map;   // get : statuslist, typelist
 };
 
 using collector_shared = std::shared_ptr<Collector>;

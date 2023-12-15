@@ -18,10 +18,14 @@ win32 {
 
 SOURCES += \
     Data/collector.cpp \
+    Network/requestmanager_add.cpp \
+    Network/requestmanager_del.cpp \
+    Network/requestmanager_get.cpp \
+    Network/requestmanager_set.cpp \
     Parser/replyparser.cpp \
     main.cpp \
     Windows\adminwindow.cpp \
-    Windows\loginrequest.cpp \
+    Windows\loginwindow.cpp \
     Windows\messagewindow.cpp \
     Windows\operatorwindow.cpp \
     Windows\userwindow.cpp \
@@ -35,7 +39,7 @@ HEADERS += \
     Data/data_types.h \
     Parser/replyparser.h \
     Windows\adminwindow.h \
-    Windows\loginrequest.h \
+    Windows\loginwindow.h \
     Windows\messagewindow.h \
     Windows\operatorwindow.h \
     Windows\userwindow.h \
@@ -45,7 +49,7 @@ HEADERS += \
 
 FORMS += \
     Forms\adminwindow.ui \
-    Forms\loginrequest.ui \
+    Forms\loginwindow.ui \
     Forms\messagewindow.ui \
     Forms\operatorwindow.ui \
     Forms\userwindow.ui

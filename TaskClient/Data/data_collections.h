@@ -5,12 +5,14 @@
 
 #include <QString>
 #include <QVector>
+#include <QMap>
 
 //
 // test, closedown, shutdown
 // add : user, task
 // del : user, task
 // set : password, usertype, taskstatus, taskuser
+// get : fullname, taskdata, userlist, tasklist, statuslist, typelist
 struct ReplyResult
 {
     bool result;
@@ -51,11 +53,10 @@ struct IntArray
 };
 
 // get : statuslist, typelist
-struct IntStrArrays
+struct IntStrMap
 {
     int size;
-    QVector<int> numbers;
-    QVector<QString>  str_vect;
+    QMap<int, QString> descriptions;
 };
 
 #endif // DATA_COLLECTIONS_H

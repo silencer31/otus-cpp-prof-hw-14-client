@@ -34,6 +34,14 @@ public:
 
     bool parse_get_request(const QJsonObject& reply_object);
 
+    bool parse_get_fullname(const QJsonObject& reply_object);
+
+    bool parse_get_id_list(const QJsonObject& reply_object);
+
+    bool parse_get_descriptions(const QJsonObject& reply_object);
+
+    bool parse_get_taskdata(const QJsonObject& reply_object);
+
     const QString& get_last_error() const {
         return last_error;
     }

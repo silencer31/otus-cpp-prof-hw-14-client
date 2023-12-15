@@ -4,6 +4,17 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 
+bool RequestManager::get_server_answer(std::string& answer)
+{
+    if ( !net_communication_ptr->read_answer()) {
+        return false;
+    }
+
+    answer = net_communication_ptr->get_answer();
+
+    return !answer.empty();
+}
+
 bool RequestManager::send_test_request()
 {
     current_request = CommandType::Test;
@@ -18,7 +29,7 @@ bool RequestManager::send_test_request()
     return net_communication_ptr->send_message(json_document.toJson().constData(), json_document.toJson().length());
 }
 
-bool RequestManager::send_login(const std::string& login, const std::string& password)
+bool RequestManager::send_login(const QString& user_name, const QString& password)
 {
     current_request = CommandType::Login;
 
@@ -26,8 +37,8 @@ bool RequestManager::send_login(const std::string& login, const std::string& pas
     QJsonObject   json_object;
 
     json_object["command"] = QString("login");
-    json_object["username"] = QString::fromStdString(login);
-    json_object["password"] = QString::fromStdString(password);
+    json_object["username"] = user_name;
+    json_object["password"] = password;
 
     json_document.setObject(json_object);
 
@@ -61,15 +72,3 @@ bool RequestManager::send_shutdown()
 
     return net_communication_ptr->send_message(json_document.toJson().constData(), json_document.toJson().length());
 }
-
-bool RequestManager::get_server_answer(std::string& answer)
-{
-    if ( !net_communication_ptr->read_answer()) {
-        return false;
-    }
-
-    answer = net_communication_ptr->get_answer();
-
-    return !answer.empty();
-}
-

@@ -5,6 +5,7 @@
 
 #include "messagewindow.h"
 #include "Network/requestmanager.h"
+#include "Parser/replyparser.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AdminWindow; }
@@ -15,21 +16,29 @@ class AdminWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    AdminWindow(const req_mngr_shared rm_ptr, const message_win_shared mw_ptr, QWidget *parent = nullptr);
+    AdminWindow() = delete;
+
+    explicit AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cltr_ptr, const parser_shared par_ptr,
+                         const message_win_shared mw_ptr, const QString& uname, QWidget *parent = nullptr);
 
     ~AdminWindow();
 
-    void set_id(int id) {
-        own_id = id;
-    }
+private: // methods
+    void check_server();
 
-private:
+private: // data
     Ui::AdminWindow *ui;
 
     const req_mngr_shared request_manager_ptr;
+    const collector_shared collector_ptr;
+    const parser_shared parser_ptr;
+
     const message_win_shared message_window_ptr;
 
-    int own_id;
+    const QString user_name;
+    const int user_id;
+
+    std::string server_reply;
 };
 
 using admin_win_unique = QScopedPointer<AdminWindow>;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LoginRequest</class>
- <widget class="QDialog" name="LoginRequest">
+ <class>LoginWindow</class>
+ <widget class="QDialog" name="LoginWindow">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -68,56 +68,26 @@ QVector<int>::const_iterator Collector::int_array_cie()
 }
 
 // Подготовить вектор с числами и строками для заполнения.
-void Collector::prepare_int_str_array(const int size)
+void Collector::prepare_int_str_map(const int size)
 {
-    int_str_arrays.numbers.clear();
-    int_str_arrays.numbers.reserve(size);
-
-    int_str_arrays.str_vect.clear();
-    int_str_arrays.str_vect.reserve(size);
-
-    int_str_arrays.size = size;
+    int_str_map.descriptions.clear();
+    int_str_map.size = size;
 }
 
 // Добавить число и строку.
-void Collector::int_str_array_push_back(const int value, const QString& str_value)
+void Collector::int_str_map_push_back(const int value, const QString& str_value)
 {
-    int_str_arrays.numbers.push_back(value);
-    int_str_arrays.str_vect.push_back(str_value);
+    int_str_map.descriptions[value] = str_value;
 }
 
-// Получить число по индексу.
-int Collector::get_isa_number_by_index(const int index)
+// Константный итератор на начало коллекции.
+QMap<int, QString>::const_iterator Collector::int_str_map_str_cib()
 {
-    return int_str_arrays.numbers.at(index);
+    return int_str_map.descriptions.constBegin();
 }
 
-// Получить число по индексу.
-QString Collector::get_isa_string_by_index(const int index)
+// Константный итератор на конец коллекции.
+QMap<int, QString>::const_iterator Collector::int_str_map_str_cie()
 {
-    return int_str_arrays.str_vect.at(index);
-}
-
-// Константный итератор на начало массива с числами.
-QVector<int>::const_iterator Collector::int_str_array_int_cib()
-{
-    return int_str_arrays.numbers.constBegin();
-}
-
-// Константный итератор на конец массива с числами.
-QVector<int>::const_iterator Collector::int_str_array_int_cie()
-{
-    return int_str_arrays.numbers.constEnd();
-}
-
-// Константный итератор на начало массива со строками.
-QVector<QString>::const_iterator Collector::int_str_array_str_cib()
-{
-    return int_str_arrays.str_vect.constBegin();
-}
-
-// Константный итератор на конец массива со строками.
-QVector<QString>::const_iterator Collector::int_str_array_str_cie()
-{
-    return int_str_arrays.str_vect.constEnd();
+    return int_str_map.descriptions.constEnd();
 }

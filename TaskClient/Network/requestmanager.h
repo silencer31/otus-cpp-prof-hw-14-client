@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include<QString>
 
 #include "netcommunication.h"
 #include "Data/data_types.h"
@@ -36,21 +37,48 @@ public:
         net_communication_ptr->disconnect();
     }
 
-    bool get_server_answer(std::string& answer);
-
     void reset_request() {
         current_request = CommandType::Unknown;
     }
 
+    bool get_server_answer(std::string& answer);
+
     bool send_test_request();
 
-    bool send_login(const std::string& login, const std::string& password);
+    bool send_login(const QString& user_name, const QString& password);
 
     bool send_closedown();
 
     bool send_shutdown();
 
+    bool send_get_fullname(const int id);
 
+    bool send_get_userlist();
+
+    bool send_get_tasklist(const int id);
+
+    bool send_get_typelist();
+
+    bool send_get_statuslist();
+
+    bool send_get_taskdata(const int id);
+
+    bool send_add_user(const QString& user_name, const int user_type, const QString& pass,
+                       const QString& second, const QString& first, const QString& patron);
+
+    bool send_add_task(const int user_id, const QString& deadline, const QString& name, const QString& description);
+
+    bool send_del_user(const int id);
+
+    bool send_del_task(const int id);
+
+    bool send_set_password(const int user_id, const QString& password);
+
+    bool send_set_usertype(const int user_id, const int user_type);
+
+    bool send_set_taskstatus(const int task_id, const int status);
+
+    bool send_set_taskuser(const int task_id, const int user_id);
 
 private:
     const net_comm_unique net_communication_ptr;

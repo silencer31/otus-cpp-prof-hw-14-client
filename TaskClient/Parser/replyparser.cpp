@@ -47,7 +47,7 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
         return false;
     }
 
-    const QString details = (reply_object.contains("details") ? reply_object["details"].toString() : QString("No deatils"));
+    const QString details = (reply_object.contains("details") ? reply_object["details"].toString() : QString("No details"));
 
     collector_ptr->set_result(reply_object["result"].toBool(), details);
 
@@ -66,7 +66,7 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
             last_error = QString("Command type is not login");
             return false;
         }
-        return parse_login_request(reply_object);
+        return (collector_ptr->get_result() ? parse_login_request(reply_object) : true);
     case CommandType::Closedown:
         if (reply_object["command"] != "closedown") {
             last_error = QString("Command type is not closedown");
@@ -130,5 +130,153 @@ bool ReplyParser::parse_login_request(const QJsonObject& reply_object)
 
 bool ReplyParser::parse_get_request(const QJsonObject& reply_object)
 {
+    if ( !reply_object.contains("type")) {
+        last_error = QString("Field type not found in get request");
+        return false;
+    }
+
+    if (reply_object["type"] == "fullname") {
+        return parse_get_fullname(reply_object);
+    }
+
+    if (reply_object["type"] == "userlist") {
+        return parse_get_id_list(reply_object);
+    }
+
+    if (reply_object["type"] == "tasklist") {
+        return parse_get_id_list(reply_object);
+    }
+
+    if (reply_object["type"] == "statuslist") {
+        return parse_get_descriptions(reply_object);
+    }
+
+    if (reply_object["type"] == "typelist") {
+        return parse_get_descriptions(reply_object);
+    }
+
+    if (reply_object["type"] == "taskdata") {
+        return parse_get_taskdata(reply_object);
+    }
+
+    last_error = QString("Unknown get request type");
+
+    return false;
+}
+
+bool ReplyParser::parse_get_fullname(const QJsonObject& reply_object)
+{
+    if (!reply_object.contains("second")) {
+        last_error = QString("second field not found in get fullname request");
+        return false;
+    }
+
+    if (!reply_object.contains("first")) {
+        last_error = QString("first field not found in get fullname request");
+        return false;
+    }
+
+    if (!reply_object.contains("patronymic")) {
+        last_error = QString("patronymic field not found in get fullname request");
+        return false;
+    }
+
+    collector_ptr->set_fullname(reply_object["second"].toString(), reply_object["first"].toString(), reply_object["patronymic"].toString());
+
+    return true;
+}
+
+bool ReplyParser::parse_get_id_list(const QJsonObject& reply_object)
+{
+    if (!reply_object.contains("id_list")) {
+        last_error = QString("Field id_list not found in get request");
+        return false;
+    }
+
+    if ( !reply_object["id_list"].isArray()) {
+        last_error = QString("Field id_list in get request is not array");
+        return false;
+    }
+
+    const QJsonArray jarray = reply_object["id_list"].toArray();
+
+    collector_ptr->prepare_int_array(jarray.size());
+
+    foreach (QJsonValue jvalue, jarray) {
+        collector_ptr->int_array_push_back(jvalue.toInt(0));
+    }
+
+    return true;
+}
+
+bool ReplyParser::parse_get_descriptions(const QJsonObject& reply_object)
+{
+    if (!reply_object.contains("numbers")) {
+        last_error = QString("Field numbers not found in get request");
+        return false;
+    }
+
+    if (!reply_object.contains("descriptions")) {
+        last_error = QString("Field descriptions not found in get request");
+        return false;
+    }
+
+    if ( !reply_object["numbers"].isArray()) {
+        last_error = QString("Field numbers in get request is not array");
+        return false;
+    }
+
+    if ( !reply_object["descriptions"].isArray()) {
+        last_error = QString("Field id_list in get request is not array");
+        return false;
+    }
+
+    const QJsonArray numbers = reply_object["numbers"].toArray();
+    const QJsonArray descriptions = reply_object["descriptions"].toArray();
+
+    if (numbers.size() != descriptions.size()) {
+        last_error = QString("Fields numbers and descriptions have different sizes");
+        return false;
+    }
+
+    collector_ptr->prepare_int_str_map(numbers.size());
+
+    for(int i = 0; i < numbers.size(); ++i) {
+        collector_ptr->int_str_map_push_back(numbers.at(i).toInt(0), descriptions.at(i).toString());
+    }
+
+    return true;
+}
+
+bool ReplyParser::parse_get_taskdata(const QJsonObject& reply_object)
+{
+    if (!reply_object.contains("user_id")) {
+        last_error = QString("Field user_id not found in get taskdata request");
+        return false;
+    }
+
+    if (!reply_object.contains("status")) {
+        last_error = QString("Field status not found in get taskdata request");
+        return false;
+    }
+
+    if (!reply_object.contains("deadline")) {
+        last_error = QString("Field deadline not found in get taskdata request");
+        return false;
+    }
+
+    if (!reply_object.contains("name")) {
+        last_error = QString("Field name not found in get taskdata request");
+        return false;
+    }
+
+    if (!reply_object.contains("description")) {
+        last_error = QString("Field description not found in get taskdata request");
+        return false;
+    }
+
+    collector_ptr->set_task_data(reply_object["user_id"].toInt(0), reply_object["status"].toInt(0),
+            reply_object["deadline"].toString(), reply_object["name"].toString(), reply_object["description"].toString());
+
     return true;
 }
