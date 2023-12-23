@@ -23,7 +23,12 @@ public:
 
     ~OperatorWindow();
 
-private:
+private: // methods
+    bool handle_request(CommandType comm_type);
+
+private slots:
+
+private: // data
     Ui::OperatorWindow *ui;
 
     const req_mngr_shared request_manager_ptr;
@@ -36,6 +41,7 @@ private:
     const int user_id;
 
     std::string server_reply;
+    QString error_text;
 };
 
 using operator_win_unique = QScopedPointer<OperatorWindow>;

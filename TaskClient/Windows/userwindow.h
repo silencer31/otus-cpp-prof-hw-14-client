@@ -21,7 +21,12 @@ public:
 
     ~UserWindow();
 
-private:
+private: // methods
+    bool handle_request(CommandType comm_type);
+
+private slots:
+
+private: // data
     Ui::UserWindow *ui;
 
     const req_mngr_shared request_manager_ptr;
@@ -34,6 +39,7 @@ private:
     const int user_id;
 
     std::string server_reply;
+    QString error_text;
 };
 
 using user_win_unique = QScopedPointer<UserWindow>;

@@ -39,14 +39,14 @@ void LoginWindow::handle_login()
 
     // Отправляем запрос логин на сервер.
     if ( !request_manager_ptr->send_login(user_name, password) ) {
-        message_window_ptr->set_message(QString::fromStdString(request_manager_ptr->get_last_error()));
+        message_window_ptr->set_message(request_manager_ptr->get_last_error());
         message_window_ptr->exec();
         return;
     }
 
     // Пытаемся получить ответ от сервера.
     if (!request_manager_ptr->get_server_answer(server_reply)) {
-        message_window_ptr->set_message(QString::fromStdString(request_manager_ptr->get_last_error()));
+        message_window_ptr->set_message(request_manager_ptr->get_last_error());
         message_window_ptr->exec();
         return;
     }

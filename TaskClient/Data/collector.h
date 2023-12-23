@@ -18,6 +18,23 @@ public:
     Collector() = default;
     ~Collector() = default;
 
+    /// Была ли ошибка в запросе клиента к серверу.
+    // Узнать была ли ошибка.
+    bool req_error() {
+        return request_error.error;
+    }
+
+    // Получить описание ошибки в запросе.
+    const QString& get_error_text() {
+        return request_error.error_text;
+    }
+
+    // Установить наличие ошибки в запросе и описание.
+    void set_request_error(bool value, const QString& text);
+
+    // Очистить предыдущую ошибку зароса.
+    void clear_request_error();
+
     /// Результат выполнения запроса (Получилось или нет).
     // Получить результат
     bool get_result() {
@@ -70,43 +87,105 @@ public:
     void set_task_data(int id, int status, const QString& dl, const QString& name, const QString& desc);
 
 
-    /// Коллекция - вектор с числами.
+    /// Коллекция - набор id пользователей.
     // Подготовить вектор с числами для заполнения.
-    void prepare_int_array(const int size);
+    void prepare_user_ids(const int size);
 
-    // Добавить число в вектор с числами.
-    void int_array_push_back(const int value);
+    // Добавить id в вектор с id пользователей.
+    void user_ids_push_back(const int value) {
+        user_ids.id_list.push_back(value);
+    }
 
-    // Получить число по индексу.
-    int get_ia_value_by_index(const int index);
+    // Получить id пользователя по индексу.
+    int get_user_id_by_index(const int index) {
+        return user_ids.id_list.at(index);
+    }
 
-    // Константный итератор на начало массива с числами.
-    QVector<int>::const_iterator int_array_cib();
+    // Константный итератор на начало массива с id пользователей.
+    QVector<int>::const_iterator user_ids_cib() {
+        return user_ids.id_list.constBegin();
+    }
 
-    // Константный итератор на конец массива с числами.
-    QVector<int>::const_iterator int_array_cie();
+    // Константный итератор на конец массива с id пользователей.
+    QVector<int>::const_iterator user_ids_cie() {
+        return user_ids.id_list.constEnd();
+    }
 
 
-    /// Коллекция с числами и строками.
-    // Подготовить коллекцию с числами и строками для заполнения.
-    void prepare_int_str_map(const int size);
+    /// Коллекция - набор id задач.
+    // Подготовить вектор с id задач для заполнения.
+    void prepare_task_ids(const int size);
 
-    // Добавить число и строку.
-    void int_str_map_push_back(const int value, const QString& str_value);
+    // Добавить число в вектор с id задач.
+    void task_ids_push_back(const int value) {
+        task_ids.id_list.push_back(value);
+    }
 
-    // Константный итератор на начало коллекции.
-    QMap<int, QString>::const_iterator int_str_map_str_cib();
+    // Получить id задачи по индексу.
+    int get_task_id_by_index(const int index) {
+        return task_ids.id_list.at(index);
+    }
 
-    // Константный итератор на конец коллекции.
-    QMap<int, QString>::const_iterator int_str_map_str_cie();
+    // Константный итератор на начало массива с id задач.
+    QVector<int>::const_iterator task_ids_cib() {
+        return task_ids.id_list.constBegin();
+    }
+
+    // Константный итератор на конец массива с id задач.
+    QVector<int>::const_iterator task_ids_cie() {
+        return task_ids.id_list.constEnd();
+    }
+
+
+    /// Коллекция - типы пользователей.
+    // Подготовить коллекцию с типами пользователей.
+    void prepare_user_types(const int size);
+
+    // Добавить номер типа и описание.
+    void user_types_push_back(const int value, const QString& str_value) {
+        user_types.descriptions[value] = str_value;
+    }
+
+    // Константный итератор на начало коллекции с типами пользователей.
+    QMap<int, QString>::const_iterator user_types_cib() {
+        return user_types.descriptions.constBegin();
+    }
+
+    // Константный итератор на конец коллекции с типами пользователей.
+    QMap<int, QString>::const_iterator user_types_cie() {
+        return user_types.descriptions.constEnd();
+    }
+
+
+    /// Коллекция - статусы задач.
+    // Подготовить коллекцию со статусами задач.
+    void prepare_task_statuses(const int size);
+
+    // Добавить номер статуса и описание.
+    void task_statuses_push_back(const int value, const QString& str_value) {
+        task_statuses.descriptions[value] = str_value;
+    }
+
+    // Константный итератор на начало коллекции со статусами задач.
+    QMap<int, QString>::const_iterator task_statuses_cib() {
+        return task_statuses.descriptions.constBegin();
+    }
+
+    // Константный итератор на конец коллекции со статусами задач.
+    QMap<int, QString>::const_iterator task_statuses_cie() {
+        return task_statuses.descriptions.constEnd();
+    }
 
 private:
+    RequestError request_error;
     ReplyResult  reply_result;
     Login        login;
     Fullname     fullname;
     TaskData     task_data;
-    IntArray     int_array;     // get : userlist, tasklist
-    IntStrMap    int_str_map;   // get : statuslist, typelist
+    IntArray     user_ids;      // get : userlist
+    IntArray     task_ids;      // get : tasklist
+    IntStrMap    user_types;    // get : typelist
+    IntStrMap    task_statuses; // get : statuslist
 };
 
 using collector_shared = std::shared_ptr<Collector>;

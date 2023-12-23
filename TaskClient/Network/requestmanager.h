@@ -29,8 +29,8 @@ public:
         return net_communication_ptr->is_connected();
     }
 
-    const std::string& get_last_error() const {
-        return net_communication_ptr->get_last_error();
+    QString get_last_error() const {
+        return QString::fromStdString(net_communication_ptr->get_last_error());
     }
 
     void disconnect_from_server() {

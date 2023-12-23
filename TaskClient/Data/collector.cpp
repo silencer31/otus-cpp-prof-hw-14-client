@@ -1,5 +1,19 @@
 #include "collector.h"
 
+// Установить наличие ошибки в запросе и описание.
+void Collector::set_request_error(bool value, const QString& text)
+{
+    request_error.error = value;
+    request_error.error_text = text;
+}
+
+// Очистить предыдущую ошибку зароса.
+void Collector::clear_request_error()
+{
+    request_error.error = false;
+    request_error.error_text.clear();
+}
+
 void Collector::set_result(bool result, const QString& details)
 {
     reply_result.result = result;
@@ -36,58 +50,30 @@ void Collector::set_task_data(int id, int status, const QString& dl, const QStri
 }
 
 // Подготовить вектор с числами для заполнения.
-void Collector::prepare_int_array(const int size)
+void Collector::prepare_user_ids(const int size)
 {
-    int_array.id_list.clear();
-    int_array.id_list.reserve(size);
-    int_array.size = size;
+    user_ids.id_list.clear();
+    user_ids.id_list.reserve(size);
+    user_ids.size = size;
 }
 
-// Добавить число в вектор с числами.
-void Collector::int_array_push_back(const int value)
+void Collector::prepare_task_ids(const int size)
 {
-    int_array.id_list.push_back(value);
+    task_ids.id_list.clear();
+    task_ids.id_list.reserve(size);
+    task_ids.size = size;
 }
 
-// Получить число по индексу.
-int Collector::get_ia_value_by_index(const int index)
+// Подготовить коллекцию с типами пользователей.
+void Collector::prepare_user_types(const int size)
 {
-    return int_array.id_list.at(index);
+    user_types.descriptions.clear();
+    user_types.size = size;
 }
 
-// Константный итератор на начало массива с числами.
-QVector<int>::const_iterator Collector::int_array_cib()
+// Подготовить коллекцию со статусами задач.
+void Collector::prepare_task_statuses(const int size)
 {
-    return int_array.id_list.constBegin();
-}
-
-// Константный итератор на конец массива с числами.
-QVector<int>::const_iterator Collector::int_array_cie()
-{
-    return int_array.id_list.constEnd();
-}
-
-// Подготовить вектор с числами и строками для заполнения.
-void Collector::prepare_int_str_map(const int size)
-{
-    int_str_map.descriptions.clear();
-    int_str_map.size = size;
-}
-
-// Добавить число и строку.
-void Collector::int_str_map_push_back(const int value, const QString& str_value)
-{
-    int_str_map.descriptions[value] = str_value;
-}
-
-// Константный итератор на начало коллекции.
-QMap<int, QString>::const_iterator Collector::int_str_map_str_cib()
-{
-    return int_str_map.descriptions.constBegin();
-}
-
-// Константный итератор на конец коллекции.
-QMap<int, QString>::const_iterator Collector::int_str_map_str_cie()
-{
-    return int_str_map.descriptions.constEnd();
+    task_statuses.descriptions.clear();
+    task_statuses.size = size;
 }

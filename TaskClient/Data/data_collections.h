@@ -7,6 +7,12 @@
 #include <QVector>
 #include <QMap>
 
+struct RequestError
+{
+    bool error; // Наличие ошибки/проблемы в самом запросе.
+    QString error_text; // Текст ошибки.
+};
+
 //
 // test, closedown, shutdown
 // add : user, task
@@ -15,7 +21,7 @@
 // get : fullname, taskdata, userlist, tasklist, statuslist, typelist
 struct ReplyResult
 {
-    bool result;
+    bool result; // Результат выполнения запроса.
     QString details;
 };
 

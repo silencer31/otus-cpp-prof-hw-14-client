@@ -26,6 +26,11 @@ public:
 private: // methods
     void check_server();
 
+    bool handle_request(CommandType comm_type);
+
+private slots:
+    void shutdown_server();
+
 private: // data
     Ui::AdminWindow *ui;
 
@@ -39,6 +44,7 @@ private: // data
     const int user_id;
 
     std::string server_reply;
+    QString error_text;
 };
 
 using admin_win_unique = QScopedPointer<AdminWindow>;
