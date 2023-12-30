@@ -14,15 +14,44 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
 {
     ui->setupUi(this);
 
-    connect(ui->pbShutdown, SIGNAL(clicked(bool)), this, SLOT(shutdown()) );
+    connect(ui->pbGetUsers, SIGNAL(clicked(bool)), this, SLOT(get_users_list()) );
+    connect(ui->pbGetTasks, SIGNAL(clicked(bool)), this, SLOT(get_tasks_list()) );
+    connect(ui->pbApplyChanges, SIGNAL(clicked(bool)), this, SLOT(apply_changes()) );
+    connect(ui->pbNewUser, SIGNAL(clicked(bool)), this, SLOT(create_user()) );
+    connect(ui->pbSetPassword, SIGNAL(clicked(bool)), this, SLOT(set_new_password()) );
+    connect(ui->pbShutdown, SIGNAL(clicked(bool)), this, SLOT(shutdown_server()) );
+
     connect(ui->pbExit, SIGNAL(clicked(bool)), this, SLOT(close()) );
 
     ui->leUserId->setText(QString::number(user_id));
     ui->leUserName->setText(user_name);
 }
 
+void AdminWindow::lock_buttons()
+{
+    ui->pbGetUsers->setEnabled(false);
+    ui->pbGetTasks->setEnabled(false);
+    ui->pbApplyChanges->setEnabled(false);
+    ui->pbNewUser->setEnabled(false);
+    ui->pbSetPassword->setEnabled(false);
+    ui->pbShutdown->setEnabled(false);
+    ui->pbExit->setEnabled(false);
+}
+
+void AdminWindow::unlock_buttons()
+{
+    ui->pbGetUsers->setEnabled(true);
+    ui->pbGetTasks->setEnabled(true);
+    ui->pbApplyChanges->setEnabled(true);
+    ui->pbNewUser->setEnabled(true);
+    ui->pbSetPassword->setEnabled(true);
+    ui->pbShutdown->setEnabled(true);
+    ui->pbExit->setEnabled(true);
+}
+
 void AdminWindow::check_server()
 {
+    // Есть ли связь с сервером.
     if (!request_manager_ptr->connected_to_server()) {
         message_window_ptr->set_message(QString("No connection with server!"));
         message_window_ptr->exec();
@@ -40,27 +69,6 @@ void AdminWindow::check_server()
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Test)) {
         message_window_ptr->set_message(QString("Server is unable to handle requests!\n%1").arg(error_text));
-        message_window_ptr->exec();
-    }
-
-    message_window_ptr->set_message(QString("Server shutdown completed.\nFurther communication impossible"));
-    message_window_ptr->exec();
-}
-
-
-void AdminWindow::shutdown_server()
-{
-    // Отправляем запрос на сервер.
-    if ( !request_manager_ptr->send_shutdown()) {
-        message_window_ptr->set_message(QString("Unable to send shutdown request!\n%1")
-                                        .arg(request_manager_ptr->get_last_error()));
-        message_window_ptr->exec();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Shutdown)) {
-        message_window_ptr->set_message(QString("Unable to shutdown server!\n%1").arg(error_text));
         message_window_ptr->exec();
     }
 

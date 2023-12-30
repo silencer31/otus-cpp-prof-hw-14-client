@@ -88,6 +88,11 @@ public:
 
 
     /// Коллекция - набор id пользователей.
+    // Пуста ли коллекция.
+    bool empty_user_ids() {
+        return user_ids.id_list.isEmpty();
+    }
+
     // Подготовить вектор с числами для заполнения.
     void prepare_user_ids(const int size);
 
@@ -113,6 +118,11 @@ public:
 
 
     /// Коллекция - набор id задач.
+    // Пуста ли коллекция.
+    bool empty_task_ids() {
+        task_ids.id_list.isEmpty();
+    }
+
     // Подготовить вектор с id задач для заполнения.
     void prepare_task_ids(const int size);
 
@@ -138,6 +148,11 @@ public:
 
 
     /// Коллекция - типы пользователей.
+    // Пуста ли коллекция.
+    bool empty_user_types() {
+        return user_types.descriptions.isEmpty();
+    }
+
     // Подготовить коллекцию с типами пользователей.
     void prepare_user_types(const int size);
 
@@ -158,6 +173,11 @@ public:
 
 
     /// Коллекция - статусы задач.
+    // Пуста ли коллекция.
+    bool empty_task_statuses() {
+        return task_statuses.descriptions.isEmpty();
+    }
+
     // Подготовить коллекцию со статусами задач.
     void prepare_task_statuses(const int size);
 

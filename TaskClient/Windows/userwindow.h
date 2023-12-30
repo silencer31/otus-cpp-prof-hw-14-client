@@ -22,9 +22,20 @@ public:
     ~UserWindow();
 
 private: // methods
+    void lock_buttons();
+
+    void unlock_buttons();
+
     bool handle_request(CommandType comm_type);
 
 private slots:
+    void get_tasks_list();
+
+    void take_task();
+
+    void set_task_status();
+
+    void create_task();
 
 private: // data
     Ui::UserWindow *ui;

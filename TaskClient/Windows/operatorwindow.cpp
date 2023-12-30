@@ -14,7 +14,36 @@ OperatorWindow::OperatorWindow(const req_mngr_shared rm_ptr, const collector_sha
 {
     ui->setupUi(this);
 
+    connect(ui->pbAppointUser, SIGNAL(clicked(bool)), this, SLOT(appoint_user()) );
+    connect(ui->pbSetStatus, SIGNAL(clicked(bool)), this, SLOT(set_task_status()) );
+    connect(ui->pbDeleteTask, SIGNAL(clicked(bool)), this, SLOT(delete_task()) );
+    connect(ui->pbGetTasks, SIGNAL(clicked(bool)), this, SLOT(get_tasks_list()) );
+    connect(ui->pbSetDeadline, SIGNAL(clicked(bool)), this, SLOT(set_deadline()) );
+    connect(ui->pbNewTask, SIGNAL(clicked(bool)), this, SLOT(create_task()) );
+
     connect(ui->pbExit, SIGNAL(clicked(bool)), this, SLOT(close()) );
+}
+
+void OperatorWindow::lock_buttons()
+{
+    ui->pbAppointUser->setEnabled(false);
+    ui->pbSetStatus->setEnabled(false);
+    ui->pbDeleteTask->setEnabled(false);
+    ui->pbGetTasks->setEnabled(false);
+    ui->pbSetDeadline->setEnabled(false);
+    ui->pbNewTask->setEnabled(false);
+    ui->pbExit->setEnabled(false);
+}
+
+void OperatorWindow::unlock_buttons()
+{
+    ui->pbAppointUser->setEnabled(true);
+    ui->pbSetStatus->setEnabled(true);
+    ui->pbDeleteTask->setEnabled(true);
+    ui->pbGetTasks->setEnabled(true);
+    ui->pbSetDeadline->setEnabled(true);
+    ui->pbNewTask->setEnabled(true);
+    ui->pbExit->setEnabled(true);
 }
 
 bool OperatorWindow::handle_request(CommandType comm_type)

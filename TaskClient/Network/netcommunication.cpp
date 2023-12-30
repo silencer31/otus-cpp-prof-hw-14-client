@@ -45,6 +45,8 @@ void NetCommunication::disconnect()
         );
 
     _sock.close(ignore);
+
+    connected = false;
 }
 
 // Отправка сообщения/запроса на сервер.

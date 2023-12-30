@@ -23,6 +23,9 @@ SOURCES += \
     Network/requestmanager_get.cpp \
     Network/requestmanager_set.cpp \
     Parser/replyparser.cpp \
+    Windows/admin_slots.cpp \
+    Windows/operator_slots.cpp \
+    Windows/user_slots.cpp \
     main.cpp \
     Windows\adminwindow.cpp \
     Windows\loginwindow.cpp \

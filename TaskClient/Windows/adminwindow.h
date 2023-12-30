@@ -24,11 +24,25 @@ public:
     ~AdminWindow();
 
 private: // methods
+    void lock_buttons();
+
+    void unlock_buttons();
+
     void check_server();
 
     bool handle_request(CommandType comm_type);
 
 private slots:
+    void get_users_list();
+
+    void get_tasks_list();
+
+    void apply_changes();
+
+    void create_user();
+
+    void set_new_password();
+
     void shutdown_server();
 
 private: // data

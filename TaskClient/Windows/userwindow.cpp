@@ -14,7 +14,32 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
 {
     ui->setupUi(this);
 
+    connect(ui->pbTakeTask, SIGNAL(clicked(bool)), this, SLOT(take_task()) );
+    connect(ui->pbSetStatus, SIGNAL(clicked(bool)), this, SLOT(set_task_status()) );
+    connect(ui->pbGetTasks, SIGNAL(clicked(bool)), this, SLOT(get_tasks_list()) );
+    connect(ui->pbNewTask, SIGNAL(clicked(bool)), this, SLOT(create_task()) );
+
     connect(ui->pbExit, SIGNAL(clicked(bool)), this, SLOT(close()) );
+}
+
+void UserWindow::lock_buttons()
+{
+    ui->pbTakeTask->setEnabled(false);
+    ui->pbSetStatus->setEnabled(false);
+    ui->pbGetTasks->setEnabled(false);
+    ui->pbNewTask->setEnabled(false);
+
+    ui->pbExit->setEnabled(false);
+}
+
+void UserWindow::unlock_buttons()
+{
+    ui->pbTakeTask->setEnabled(true);
+    ui->pbSetStatus->setEnabled(true);
+    ui->pbGetTasks->setEnabled(true);
+    ui->pbNewTask->setEnabled(true);
+
+    ui->pbExit->setEnabled(true);
 }
 
 bool UserWindow::handle_request(CommandType comm_type)

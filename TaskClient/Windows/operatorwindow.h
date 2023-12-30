@@ -24,9 +24,24 @@ public:
     ~OperatorWindow();
 
 private: // methods
+    void lock_buttons();
+
+    void unlock_buttons();
+
     bool handle_request(CommandType comm_type);
 
 private slots:
+    void get_tasks_list();
+
+    void appoint_user();
+
+    void set_task_status();
+
+    void delete_task();
+
+    void set_deadline();
+
+    void create_task();
 
 private: // data
     Ui::OperatorWindow *ui;
