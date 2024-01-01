@@ -10,7 +10,7 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
     , parser_ptr(par_ptr)
     , message_window_ptr(mw_ptr)
     , user_name(uname)
-    , user_id(collector_ptr->get_user_id())
+    , user_id(collector_ptr->get_own_id())
 {
     ui->setupUi(this);
 

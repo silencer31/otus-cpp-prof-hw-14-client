@@ -18,7 +18,7 @@ struct RequestError
 // add : user, task
 // del : user, task
 // set : password, usertype, taskstatus, taskuser
-// get : fullname, taskdata, userlist, tasklist, statuslist, typelist
+// get : username, fullname, taskdata, userlist, tasklist, statuslist, typelist
 struct ReplyResult
 {
     bool result; // Результат выполнения запроса.
@@ -27,9 +27,16 @@ struct ReplyResult
 
 // Для ответа на запрос логин клиента.
 // login
-struct Login
+struct IdType
 {
     int user_id;
+    int user_type;
+};
+
+// get : username
+struct LoginType
+{
+    QString user_name;
     int user_type;
 };
 

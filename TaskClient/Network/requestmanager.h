@@ -51,6 +51,8 @@ public:
 
     bool send_shutdown();
 
+    bool send_get_username(const int id);
+
     bool send_get_fullname(const int id);
 
     bool send_get_userlist();

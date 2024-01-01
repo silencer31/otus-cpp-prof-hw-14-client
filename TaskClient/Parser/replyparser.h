@@ -34,8 +34,9 @@ public:
 
     bool parse_get_request(const QJsonObject& reply_object);
 
-    bool parse_get_fullname(const QJsonObject& reply_object);
+    bool parse_get_username(const QJsonObject& reply_object);
 
+    bool parse_get_fullname(const QJsonObject& reply_object);
 
     bool parse_get_user_ids(const QJsonObject& reply_object);
 

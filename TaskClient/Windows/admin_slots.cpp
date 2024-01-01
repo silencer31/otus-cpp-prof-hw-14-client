@@ -71,8 +71,29 @@ void AdminWindow::get_users_list()
         return;
     }
 
+    // Для всех полученных id запрашиваем логин и тип пользователя.
     for(auto iter = collector_ptr->user_ids_cib(); iter != collector_ptr->user_ids_cie(); ++iter) {
-        ui->textBrowser->append(QString::number(*iter));
+        // Запрос списка типа пользователей.
+        if (!request_manager_ptr->send_get_username(*iter)) {
+            message_window_ptr->set_message(QString("Unable to send get username request!\n\n%1")
+                                            .arg(request_manager_ptr->get_last_error()));
+            message_window_ptr->exec();
+            unlock_buttons();
+            return;
+        }
+
+        // Контроль выполнения запроса.
+        if ( !handle_request(CommandType::Get)) {
+            message_window_ptr->set_message(QString("Unable to get user login and type!\n\n%1").arg(error_text));
+            message_window_ptr->exec();
+            unlock_buttons();
+            return;
+        }
+
+        ui->textBrowser->append(QString("%1: %2 %3")
+                                .arg(QString::number(*iter),
+                                     QString::number(collector_ptr->get_usertype()),
+                                      collector_ptr->get_username()));
     }
 
     unlock_buttons();

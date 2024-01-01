@@ -27,10 +27,17 @@ void Collector::clear_result()
     reply_result.details.clear();
 }
 
-void Collector::set_login(int id, int type)
+void Collector::set_id_and_type(int id, int type)
 {
-    login.user_id = id;
-    login.user_type = type;
+    id_type.user_id = id;
+    id_type.user_type = type;
+}
+
+// Установить username и тип пользователя.
+void Collector::set_login_and_type(const QString& username, int type)
+{
+    login_type.user_name = username;
+    login_type.user_type = type;
 }
 
 void Collector::set_fullname(const QString& second, const QString& first, const QString& patron)

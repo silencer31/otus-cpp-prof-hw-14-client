@@ -69,11 +69,11 @@ int main(int argc, char *argv[])
                                                          message_window_ptr, login_window_ptr->get_user_name()));
 
     UserType user_type{UserType::Unsupported};
-    user_type = static_cast<UserType>(collector_ptr->get_user_type());
+    user_type = static_cast<UserType>(collector_ptr->get_own_type());
 
     switch(user_type) {
     case UserType::Unsupported:
-        message_window_ptr->set_message(QString("Unsupported user type: %1").arg(QString::number(collector_ptr->get_user_type())));
+        message_window_ptr->set_message(QString("Unsupported user type: %1").arg(QString::number(collector_ptr->get_own_type())));
         message_window_ptr->exec();
         return 1;
     case UserType::Administrator:
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
         user_window_ptr->show();
         break;
     default:
-        message_window_ptr->set_message(QString("Unsupported user type: %1").arg(QString::number(collector_ptr->get_user_type())));
+        message_window_ptr->set_message(QString("Unsupported user type: %1").arg(QString::number(collector_ptr->get_own_type())));
         message_window_ptr->exec();
         return 1;
     }

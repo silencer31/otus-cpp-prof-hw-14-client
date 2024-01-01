@@ -143,7 +143,7 @@ bool ReplyParser::parse_login_request(const QJsonObject& reply_object)
         return false;
     }
 
-    collector_ptr->set_login(reply_object["user_id"].toInt(0), reply_object["user_type"].toInt(0));
+    collector_ptr->set_id_and_type(reply_object["user_id"].toInt(0), reply_object["user_type"].toInt(0));
 
     return true;
 }
@@ -153,6 +153,10 @@ bool ReplyParser::parse_get_request(const QJsonObject& reply_object)
     if ( !reply_object.contains("type")) {
         last_error = QString("Field type not found in get request");
         return false;
+    }
+
+    if (reply_object["type"] == "username") {
+        return parse_get_username(reply_object);
     }
 
     if (reply_object["type"] == "fullname") {
@@ -182,6 +186,23 @@ bool ReplyParser::parse_get_request(const QJsonObject& reply_object)
     last_error = QString("Unknown get request type");
 
     return false;
+}
+
+bool ReplyParser::parse_get_username(const QJsonObject& reply_object)
+{
+    if (!reply_object.contains("user_type")) {
+        last_error = QString("user_type field not found in get username request");
+        return false;
+    }
+
+    if (!reply_object.contains("user_name")) {
+        last_error = QString("user_name field not found in get username request");
+        return false;
+    }
+
+    collector_ptr->set_login_and_type(reply_object["user_name"].toString(), reply_object["user_type"].toInt(0));
+
+    return true;
 }
 
 bool ReplyParser::parse_get_fullname(const QJsonObject& reply_object)

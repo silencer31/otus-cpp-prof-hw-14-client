@@ -54,18 +54,31 @@ public:
 
     /// Логин пользователя на сервере.
     // Получить id пользователя в базе.
-    int get_user_id() {
-        return login.user_id;
+    int get_own_id() {
+        return id_type.user_id;
     }
 
     // Получить тип пользователя в базе.
-    int get_user_type() {
-        return login.user_type;
+    int get_own_type() {
+        return id_type.user_type;
     }
 
     // Установить id и тип пользователя.
-    void set_login(int id, int type);
+    void set_id_and_type(int id, int type);
 
+    /// Логин и тип другого пользователя в базе(не свои).
+    // Установить username и тип пользователя.
+    void set_login_and_type(const QString& username, int type);
+
+    // Получить чужой логин.
+    const QString& get_username() {
+        return login_type.user_name;
+    }
+
+    // Получить чужой тип.
+    int get_usertype() {
+        return login_type.user_type;
+    }
 
     /// ФИО пользователя.
     // Получить структуру с ФИО
@@ -199,7 +212,8 @@ public:
 private:
     RequestError request_error;
     ReplyResult  reply_result;
-    Login        login;
+    IdType       id_type;
+    LoginType    login_type;
     Fullname     fullname;
     TaskData     task_data;
     IntArray     user_ids;      // get : userlist
