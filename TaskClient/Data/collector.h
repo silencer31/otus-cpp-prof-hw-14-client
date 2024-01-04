@@ -67,35 +67,18 @@ public:
     void set_id_and_type(int id, int type);
 
     /// Логин и тип другого пользователя в базе(не свои).
+    // Получить чужую пару логин и тип.
+    const LoginType& get_login_and_type() {
+        return login_type;
+    }
+
     // Установить username и тип пользователя.
     void set_login_and_type(const QString& username, int type);
-
-    // Получить чужой логин.
-    const QString& get_username() {
-        return login_type.user_name;
-    }
-
-    // Получить чужой тип.
-    int get_usertype() {
-        return login_type.user_type;
-    }
 
     /// ФИО пользователя.
     // Получить структуру с ФИО
     const Fullname& get_fullname() {
         return fullname;
-    }
-
-    const QString& get_firstname() {
-        return fullname.first;
-    }
-
-    const QString& get_secondname() {
-        return fullname.second;
-    }
-
-    const QString& get_patronymic() {
-        return fullname.patronymic;
     }
 
     // Установить ФИО.

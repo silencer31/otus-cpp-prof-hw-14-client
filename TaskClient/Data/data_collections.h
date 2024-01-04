@@ -48,6 +48,17 @@ struct Fullname
     QString patronymic; // Отчество.
 };
 
+struct UserData
+{
+    UserData() = default;
+
+    explicit UserData(const LoginType& lt, const Fullname& fn)
+        : login_type(lt), fullname(fn) {}
+
+    LoginType login_type;
+    Fullname  fullname;
+};
+
 // get : taskdata
 struct TaskData
 {

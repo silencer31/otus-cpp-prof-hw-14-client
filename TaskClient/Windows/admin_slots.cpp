@@ -45,10 +45,8 @@ void AdminWindow::get_users_list()
         return;
     }
 
-    int row_number;
-
-    // Очищаем таблицу от предыдущих строк.
-    users_table_model->removeRows(1, users_table_model->rowCount()-1);
+    // Очищаем коллекцию с данными пользователей.
+    data_keeper_ptr->users_clear();
 
     // Для всех полученных id запрашиваем логин и тип пользователя.
     for(auto iter = collector_ptr->user_ids_cib(); iter != collector_ptr->user_ids_cie(); ++iter) {
@@ -86,16 +84,26 @@ void AdminWindow::get_users_list()
             return;
         }
 
-        // Вывод новой строки в таблицу.
+        // Добавляем данные пользователя в коллекцию.
+        data_keeper_ptr->add_user( *iter, UserData(collector_ptr->get_login_and_type(), collector_ptr->get_fullname()));
+    }
+
+    // Очищаем таблицу от предыдущих строк.
+    users_table_model->removeRows(1, users_table_model->rowCount()-1);
+
+    int row_number;
+
+    // Вывод данных в таблицу.
+    for(auto iter = data_keeper_ptr->users_data_cib(); iter != data_keeper_ptr->users_data_cie(); ++iter) {
         users_table_model->insertRow(users_table_model->rowCount());
         row_number = users_table_model->rowCount()-1;
 
-        users_table_model->setData(users_table_model->index(row_number, 0), QString::number(*iter), Qt::DisplayRole);
-        users_table_model->setData(users_table_model->index(row_number, 1), collector_ptr->get_username(), Qt::DisplayRole);
-        users_table_model->setData(users_table_model->index(row_number, 2), collector_ptr->type_description(collector_ptr->get_usertype()), Qt::DisplayRole);
-        users_table_model->setData(users_table_model->index(row_number, 3), collector_ptr->get_secondname(), Qt::DisplayRole);
-        users_table_model->setData(users_table_model->index(row_number, 4), collector_ptr->get_firstname(), Qt::DisplayRole);
-        users_table_model->setData(users_table_model->index(row_number, 5), collector_ptr->get_patronymic(), Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 0), QString::number(iter.key()), Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 1), iter->login_type.user_name, Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 2), collector_ptr->type_description(iter->login_type.user_type), Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 3), iter->fullname.second, Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 4), iter->fullname.first, Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 5), iter->fullname.patronymic, Qt::DisplayRole);
     }
 
     unlock_buttons();
@@ -151,10 +159,8 @@ void AdminWindow::get_tasks_list()
         return;
     }
 
-    int row_number;
-
-    // Очищаем таблицу от предыдущих строк.
-    tasks_table_model->removeRows(1, tasks_table_model->rowCount()-1);
+    // Очищаем коллекцию с данными задач.
+    data_keeper_ptr->tasks_clear();
 
     // Для всех полученных id запрашиваем данные задачи.
     for(auto iter = collector_ptr->task_ids_cib(); iter != collector_ptr->task_ids_cie(); ++iter) {
@@ -175,17 +181,31 @@ void AdminWindow::get_tasks_list()
             return;
         }
 
-        // Вывод новой строки в таблицу.
+        // Добавляем данные задачи в коллекцию.
+        data_keeper_ptr->add_task( *iter, collector_ptr->get_task_data());
+    }
+
+    int row_number;
+
+    // Очищаем таблицу от предыдущих строк.
+    tasks_table_model->removeRows(1, tasks_table_model->rowCount()-1);
+
+    // Вывод данных в таблицу.
+    for(auto iter = data_keeper_ptr->tasks_data_cib(); iter != data_keeper_ptr->tasks_data_cie(); ++iter) {
         tasks_table_model->insertRow(tasks_table_model->rowCount());
         row_number = tasks_table_model->rowCount()-1;
 
-        tasks_table_model->setData(tasks_table_model->index(row_number, 0), QString::number(*iter), Qt::DisplayRole);
-        tasks_table_model->setData(tasks_table_model->index(row_number, 1), collector_ptr->status_description(collector_ptr->get_task_status()), Qt::DisplayRole);
-        tasks_table_model->setData(tasks_table_model->index(row_number, 2), collector_ptr->get_task_name(), Qt::DisplayRole);
-        tasks_table_model->setData(tasks_table_model->index(row_number, 3), collector_ptr->get_task_deadline(), Qt::DisplayRole);
-        tasks_table_model->setData(tasks_table_model->index(row_number, 4), collector_ptr->get_task_description(), Qt::DisplayRole);
-        tasks_table_model->setData(tasks_table_model->index(row_number, 5), QString::number(collector_ptr->get_task_user_id()), Qt::DisplayRole);
-        tasks_table_model->setData(tasks_table_model->index(row_number, 6), QString("login"), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 0), iter.key(), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 1), collector_ptr->status_description(iter->status), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 2), iter->name, Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 3), iter->deadline, Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 4), iter->description, Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 5), QString::number(iter->user_id), Qt::DisplayRole);
+
+        tasks_table_model->setData(tasks_table_model->index(row_number, 6),
+                                   data_keeper_ptr->users_containes(iter->user_id) ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name : QString("Unknown"),
+                                   Qt::DisplayRole);
+
     }
 
     unlock_buttons();

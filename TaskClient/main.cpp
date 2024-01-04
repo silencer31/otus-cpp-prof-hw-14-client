@@ -21,6 +21,9 @@ int main(int argc, char *argv[])
     // Парсер json ответов от сервера.
     const parser_shared parser_ptr{ std::make_shared<ReplyParser>(collector_ptr)};
 
+    // Хранитель полученных данных о пользователях и задачах.
+    const data_keeper_shared data_keeper_ptr{ std::make_shared<DataKeeper>()};
+
     // Окно для показа сообщений.
     const message_win_shared message_window_ptr(new MessageWindow());
 
@@ -55,17 +58,17 @@ int main(int argc, char *argv[])
     }
 
     // Окно для задач администратора.
-    const admin_win_unique admin_window_ptr(new AdminWindow(request_manager_ptr, collector_ptr, parser_ptr,
+    const admin_win_unique admin_window_ptr(new AdminWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,
                                                             message_window_ptr, login_window_ptr->get_user_name()));
 
 
     // Окно для задач оператора базы данных.
-    const operator_win_unique operator_window_ptr(new OperatorWindow(request_manager_ptr, collector_ptr, parser_ptr,
+    const operator_win_unique operator_window_ptr(new OperatorWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,
                                                                      message_window_ptr, login_window_ptr->get_user_name()));
 
 
     // Окно для задач обычного пользователя.
-    const user_win_unique user_window_ptr(new UserWindow(request_manager_ptr, collector_ptr, parser_ptr,
+    const user_win_unique user_window_ptr(new UserWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,
                                                          message_window_ptr, login_window_ptr->get_user_name()));
 
     UserType user_type{UserType::Unsupported};
