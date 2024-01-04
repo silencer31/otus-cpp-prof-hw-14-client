@@ -59,7 +59,10 @@ bool RequestManager::send_get_tasklist(const int id)
 
     json_object["command"] = QString("get");
     json_object["type"] = QString("tasklist");
-    json_object["user_id"] = id;
+
+    if (id >= 0) {
+        json_object["user_id"] = id;
+    }
 
     json_document.setObject(json_object);
 

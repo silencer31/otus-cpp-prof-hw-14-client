@@ -14,37 +14,10 @@ void AdminWindow::get_users_list()
         return;
     }
 
-    // Проверяем, был ли ранее получен список типов пользователей.
-    if (collector_ptr->empty_user_types()) {
-        // Запрос списка типа пользователей.
-        if (!request_manager_ptr->send_get_typelist()) {
-            message_window_ptr->set_message(QString("Unable to send get typelist request!\n\n%1")
-                                            .arg(request_manager_ptr->get_last_error()));
-            message_window_ptr->exec();
-            unlock_buttons();
-            return;
-        }
-
-        // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
-            message_window_ptr->set_message(QString("Unable to get user types!\n\n%1").arg(error_text));
-            message_window_ptr->exec();
-            unlock_buttons();
-            return;
-        }
-    }
-
-    ui->textBrowser->clear();
-
-    // Проверяем, что получено от сервера.
-    if (collector_ptr->empty_user_types()) {
-        ui->textBrowser->append(QString("Получена пустая коллекция типов пользователей"));
+    // Запрос типов пользователей.
+    if ( !get_user_types()) {
         unlock_buttons();
         return;
-    }
-
-    for(auto iter = collector_ptr->user_types_cib(); iter != collector_ptr->user_types_cie(); ++iter) {
-        ui->textBrowser->append(*iter);
     }
 
     // Запрос списка id пользователей.
@@ -65,15 +38,21 @@ void AdminWindow::get_users_list()
     }
 
     // Проверяем, что получено от сервера.
-    if (collector_ptr->empty_user_ids()) {
-        ui->textBrowser->append(QString("Получена пустая коллекция id пользователей"));
+    if (!collector_ptr->user_ids_received()) {
+        message_window_ptr->set_message(QString("Получена пустая коллекция id пользователей"));
+        message_window_ptr->exec();
         unlock_buttons();
         return;
     }
 
+    int row_number;
+
+    // Очищаем таблицу от предыдущих строк.
+    users_table_model->removeRows(1, users_table_model->rowCount()-1);
+
     // Для всех полученных id запрашиваем логин и тип пользователя.
     for(auto iter = collector_ptr->user_ids_cib(); iter != collector_ptr->user_ids_cie(); ++iter) {
-        // Запрос списка типа пользователей.
+        // Запрос логина и типа пользователя.
         if (!request_manager_ptr->send_get_username(*iter)) {
             message_window_ptr->set_message(QString("Unable to send get username request!\n\n%1")
                                             .arg(request_manager_ptr->get_last_error()));
@@ -90,10 +69,33 @@ void AdminWindow::get_users_list()
             return;
         }
 
-        ui->textBrowser->append(QString("%1: %2 %3")
-                                .arg(QString::number(*iter),
-                                     QString::number(collector_ptr->get_usertype()),
-                                      collector_ptr->get_username()));
+        // Запрос ФИО пользователя.
+        if (!request_manager_ptr->send_get_fullname(*iter)) {
+            message_window_ptr->set_message(QString("Unable to send get fullname request!\n\n%1")
+                                                .arg(request_manager_ptr->get_last_error()));
+            message_window_ptr->exec();
+            unlock_buttons();
+            return;
+        }
+
+        // Контроль выполнения запроса.
+        if ( !handle_request(CommandType::Get)) {
+            message_window_ptr->set_message(QString("Unable to get user fullname!\n\n%1").arg(error_text));
+            message_window_ptr->exec();
+            unlock_buttons();
+            return;
+        }
+
+        // Вывод новой строки в таблицу.
+        users_table_model->insertRow(users_table_model->rowCount());
+        row_number = users_table_model->rowCount()-1;
+
+        users_table_model->setData(users_table_model->index(row_number, 0), QString::number(*iter), Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 1), collector_ptr->get_username(), Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 2), collector_ptr->type_description(collector_ptr->get_usertype()), Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 3), collector_ptr->get_secondname(), Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 4), collector_ptr->get_firstname(), Qt::DisplayRole);
+        users_table_model->setData(users_table_model->index(row_number, 5), collector_ptr->get_patronymic(), Qt::DisplayRole);
     }
 
     unlock_buttons();
@@ -104,23 +106,89 @@ void AdminWindow::get_tasks_list()
     // Блокируем кнопки
     lock_buttons();
 
-    if (collector_ptr->empty_user_types()) {
-        if (request_manager_ptr->send_get_typelist()) {
-
-        }
+    // Есть ли связь с сервером.
+    if (!request_manager_ptr->connected_to_server()) {
+        message_window_ptr->set_message(QString("No connection with server!"));
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
     }
 
-    if (collector_ptr->empty_task_statuses()) {
-        if (request_manager_ptr->send_get_statuslist()) {
-
-        }
+    // Запрос типов пользователей.
+    if ( !get_user_types()) {
+        unlock_buttons();
+        return;
     }
-/*
-    request_manager_ptr->send_get_userlist();
 
-    request_manager_ptr->send_get_tasklist();
+    // Запрос возможных статусов задач.
+    if ( !get_task_statuses()) {
+        unlock_buttons();
+        return;
+    }
 
-    request_manager_ptr->send_get_taskdata();*/
+    // Запрос списка id задач.
+    if (!request_manager_ptr->send_get_tasklist()) {
+        message_window_ptr->set_message(QString("Unable to send get tasklist request!\n\n%1")
+                                            .arg(request_manager_ptr->get_last_error()));
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Контроль выполнения запроса.
+    if ( !handle_request(CommandType::Get)) {
+        message_window_ptr->set_message(QString("Unable to get task ids!\n\n%1").arg(error_text));
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Проверяем, что получено от сервера.
+    if (!collector_ptr->task_ids_received()) {
+        message_window_ptr->set_message(QString("Получена пустая коллекция id задач"));
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    int row_number;
+
+    // Очищаем таблицу от предыдущих строк.
+    tasks_table_model->removeRows(1, tasks_table_model->rowCount()-1);
+
+    // Для всех полученных id запрашиваем данные задачи.
+    for(auto iter = collector_ptr->task_ids_cib(); iter != collector_ptr->task_ids_cie(); ++iter) {
+        // Запрос данных задачи.
+        if (!request_manager_ptr->send_get_taskdata(*iter)) {
+            message_window_ptr->set_message(QString("Unable to send get taskdata request!\n\n%1")
+                                                .arg(request_manager_ptr->get_last_error()));
+            message_window_ptr->exec();
+            unlock_buttons();
+            return;
+        }
+
+        // Контроль выполнения запроса.
+        if ( !handle_request(CommandType::Get)) {
+            message_window_ptr->set_message(QString("Unable to get task data!\n\n%1").arg(error_text));
+            message_window_ptr->exec();
+            unlock_buttons();
+            return;
+        }
+
+        // Вывод новой строки в таблицу.
+        tasks_table_model->insertRow(tasks_table_model->rowCount());
+        row_number = tasks_table_model->rowCount()-1;
+
+        tasks_table_model->setData(tasks_table_model->index(row_number, 0), QString::number(*iter), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 1), collector_ptr->status_description(collector_ptr->get_task_status()), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 2), collector_ptr->get_task_name(), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 3), collector_ptr->get_task_deadline(), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 4), collector_ptr->get_task_description(), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 5), QString::number(collector_ptr->get_task_user_id()), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(row_number, 6), QString("login"), Qt::DisplayRole);
+    }
+
+    unlock_buttons();
 }
 
 void AdminWindow::apply_changes()

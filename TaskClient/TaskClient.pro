@@ -25,6 +25,7 @@ SOURCES += \
     Parser/replyparser.cpp \
     Windows/admin_slots.cpp \
     Windows/operator_slots.cpp \
+    Windows/simple_delegate.cpp \
     Windows/user_slots.cpp \
     main.cpp \
     Windows\adminwindow.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     Data/data_collections.h \
     Data/data_types.h \
     Parser/replyparser.h \
+    Windows/simple_delegate.h \
     Windows\adminwindow.h \
     Windows\loginwindow.h \
     Windows\messagewindow.h \

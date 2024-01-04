@@ -11,8 +11,38 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
     , message_window_ptr(mw_ptr)
     , user_name(uname)
     , user_id(collector_ptr->get_own_id())
+    , tasks_table_model(new QStandardItemModel())
+    , tasks_table_delegate(new SimpleItemDelegate(tasks_table_model))
 {
     ui->setupUi(this);
+
+#ifdef WIN32
+    QFont font = QFont("Tahoma", 12, QFont::DemiBold);
+#else
+    QFont font = QFont("Open Sans", 12, QFont::DemiBold);
+#endif
+
+    // Настройка модели с данными о задачах.
+    tasks_table_model->insertRow(0);
+    tasks_table_model->insertColumns(0,2);
+    tasks_table_model->setData(tasks_table_model->index(0, 0), QString("  Номер"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 1), QString("Есть на АРМ"), Qt::DisplayRole);
+    tasks_table_model->itemFromIndex(tasks_table_model->index(0, 0))->setFont(font);
+    tasks_table_model->itemFromIndex(tasks_table_model->index(0, 0))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    tasks_table_model->itemFromIndex(tasks_table_model->index(0, 1))->setFont(font);
+    tasks_table_model->itemFromIndex(tasks_table_model->index(0, 1))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+    // Настройка отображения таблицы с данными о задачах.
+    ui->tvTasks->setModel(tasks_table_model);
+    ui->tvTasks->setItemDelegate(tasks_table_delegate); // Устанавливаем делегат в представление.
+    ui->tvTasks->horizontalHeader()->hide();
+    ui->tvTasks->verticalHeader()->hide();
+    ui->tvTasks->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->tvTasks->setShowGrid(true);
+    ui->tvTasks->setRowHeight(0, ROW_HEIGHT);
+    ui->tvTasks->setColumnWidth(0, 230);
+    ui->tvTasks->setColumnWidth(1, 120);
+    ui->tvTasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     connect(ui->pbTakeTask, SIGNAL(clicked(bool)), this, SLOT(take_task()) );
     connect(ui->pbSetStatus, SIGNAL(clicked(bool)), this, SLOT(set_task_status()) );

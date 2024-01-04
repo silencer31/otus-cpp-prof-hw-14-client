@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "messagewindow.h"
+#include "simple_delegate.h"
 #include "Network/requestmanager.h"
 #include "Parser/replyparser.h"
 
@@ -48,6 +49,10 @@ private: // data
 
     const QString user_name;
     const int user_id;
+
+    QStandardItemModel *tasks_table_model; // Модель для таблицы с данными о задачах.
+
+    SimpleItemDelegate *tasks_table_delegate{nullptr}; // Делегат для таблицы.
 
     std::string server_reply;
     QString error_text;

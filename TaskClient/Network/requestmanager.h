@@ -57,7 +57,7 @@ public:
 
     bool send_get_userlist();
 
-    bool send_get_tasklist(const int id);
+    bool send_get_tasklist(const int id = -1);
 
     bool send_get_typelist();
 

@@ -86,6 +86,18 @@ public:
         return fullname;
     }
 
+    const QString& get_firstname() {
+        return fullname.first;
+    }
+
+    const QString& get_secondname() {
+        return fullname.second;
+    }
+
+    const QString& get_patronymic() {
+        return fullname.patronymic;
+    }
+
     // Установить ФИО.
     void set_fullname(const QString& second, const QString& first, const QString& patron);
 
@@ -96,14 +108,34 @@ public:
         return task_data;
     }
 
+    int get_task_user_id() {
+        return task_data.user_id;
+    }
+
+    int get_task_status() {
+        return task_data.status;
+    }
+
+    const QString& get_task_name() {
+        return task_data.name;
+    }
+
+    const QString& get_task_deadline() {
+        return task_data.deadline;
+    }
+
+    const QString& get_task_description() {
+        return task_data.description;
+    }
+
     // Установить данные задачи.
     void set_task_data(int id, int status, const QString& dl, const QString& name, const QString& desc);
 
 
     /// Коллекция - набор id пользователей.
-    // Пуста ли коллекция.
-    bool empty_user_ids() {
-        return user_ids.id_list.isEmpty();
+    // Есть ли данные в коллекции.
+    bool user_ids_received() {
+        return !user_ids.id_list.isEmpty();
     }
 
     // Подготовить вектор с числами для заполнения.
@@ -131,9 +163,9 @@ public:
 
 
     /// Коллекция - набор id задач.
-    // Пуста ли коллекция.
-    bool empty_task_ids() {
-        task_ids.id_list.isEmpty();
+    // Есть ли данные в коллекции.
+    bool task_ids_received() {
+        return !task_ids.id_list.isEmpty();
     }
 
     // Подготовить вектор с id задач для заполнения.
@@ -161,9 +193,9 @@ public:
 
 
     /// Коллекция - типы пользователей.
-    // Пуста ли коллекция.
-    bool empty_user_types() {
-        return user_types.descriptions.isEmpty();
+    // Есть ли данные в коллекции.
+    bool user_types_received() {
+        return !user_types.descriptions.isEmpty();
     }
 
     // Подготовить коллекцию с типами пользователей.
@@ -172,6 +204,11 @@ public:
     // Добавить номер типа и описание.
     void user_types_push_back(const int value, const QString& str_value) {
         user_types.descriptions[value] = str_value;
+    }
+
+    // Текстовое соответствие номеру типа пользователя.
+    QString type_description(const int value) {
+        return user_types.descriptions.contains(value) ? user_types.descriptions[value] : QString();
     }
 
     // Константный итератор на начало коллекции с типами пользователей.
@@ -186,9 +223,9 @@ public:
 
 
     /// Коллекция - статусы задач.
-    // Пуста ли коллекция.
-    bool empty_task_statuses() {
-        return task_statuses.descriptions.isEmpty();
+    // Есть ли данные в коллекции.
+    bool task_statuses_received() {
+        return !task_statuses.descriptions.isEmpty();
     }
 
     // Подготовить коллекцию со статусами задач.
@@ -197,6 +234,11 @@ public:
     // Добавить номер статуса и описание.
     void task_statuses_push_back(const int value, const QString& str_value) {
         task_statuses.descriptions[value] = str_value;
+    }
+
+    // Текстовое соответствие номеру статуса задачи.
+    QString status_description(const int value) {
+        return task_statuses.descriptions.contains(value) ? task_statuses.descriptions[value] : QString();
     }
 
     // Константный итератор на начало коллекции со статусами задач.

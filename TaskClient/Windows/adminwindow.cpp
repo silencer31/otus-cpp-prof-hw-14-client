@@ -11,8 +11,80 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     , message_window_ptr(mw_ptr)
     , user_name(uname)
     , user_id(collector_ptr->get_own_id())
+    , users_table_model(new QStandardItemModel())
+    , tasks_table_model(new QStandardItemModel())
+    , users_table_delegate(new SimpleItemDelegate(users_table_model))
+    , tasks_table_delegate(new SimpleItemDelegate(tasks_table_model))
 {
     ui->setupUi(this);
+
+#ifdef WIN32
+    QFont font = QFont("Tahoma", 12, QFont::DemiBold);
+#else
+    QFont font = QFont("Open Sans", 12, QFont::DemiBold);
+#endif
+
+    // Настройка модели с данными о пользователях.
+    users_table_model->insertRow(0);
+    users_table_model->insertColumns(0, 6);
+    users_table_model->setData(users_table_model->index(0, 0), QString("User id"), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(0, 1), QString("Login"), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(0, 2), QString("Type"), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(0, 3), QString("Surename"), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(0, 4), QString("Name"), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(0, 5), QString("Patronymic"), Qt::DisplayRole);
+    for(int i = 0; i < 6; ++i) {
+        users_table_model->itemFromIndex(users_table_model->index(0, i))->setFont(font);
+        users_table_model->itemFromIndex(users_table_model->index(0, i))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    }
+
+    // Настройка модели с данными о задачах.
+    tasks_table_model->insertRow(0);
+    tasks_table_model->insertColumns(0, 7);
+    tasks_table_model->setData(tasks_table_model->index(0, 0), QString("Task id"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 1), QString("Status"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 2), QString("Name"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 3), QString("Deadline"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 4), QString("Description"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 5), QString("User id"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 6), QString("Login"), Qt::DisplayRole);
+    for(int i = 0; i < 7; ++i) {
+        tasks_table_model->itemFromIndex(tasks_table_model->index(0, i))->setFont(font);
+        tasks_table_model->itemFromIndex(tasks_table_model->index(0, i))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    }
+
+    // Настройка отображения таблицы с данными о пользователях.
+    ui->tvUsers->setModel(users_table_model);
+    ui->tvUsers->setItemDelegate(users_table_delegate); // Устанавливаем делегат в представление.
+    ui->tvUsers->horizontalHeader()->hide();
+    ui->tvUsers->verticalHeader()->hide();
+    ui->tvUsers->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->tvUsers->setShowGrid(true);
+    ui->tvUsers->setRowHeight(0, ROW_HEIGHT);
+    ui->tvUsers->setColumnWidth(0, 100); // User id
+    ui->tvUsers->setColumnWidth(1, 200); // Login
+    ui->tvUsers->setColumnWidth(2, 200); // Type
+    ui->tvUsers->setColumnWidth(3, 300); // Surename
+    ui->tvUsers->setColumnWidth(4, 200); // Name
+    ui->tvUsers->setColumnWidth(5, 300); // Patronymic
+    ui->tvUsers->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    // Настройка отображения таблицы с данными о задачах.
+    ui->tvTasks->setModel(tasks_table_model);
+    ui->tvTasks->setItemDelegate(tasks_table_delegate); // Устанавливаем делегат в представление.
+    ui->tvTasks->horizontalHeader()->hide();
+    ui->tvTasks->verticalHeader()->hide();
+    ui->tvTasks->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->tvTasks->setShowGrid(true);
+    ui->tvTasks->setRowHeight(0, ROW_HEIGHT);
+    ui->tvTasks->setColumnWidth(0, 100); // Task id
+    ui->tvTasks->setColumnWidth(1, 150); // Status
+    ui->tvTasks->setColumnWidth(2, 250); // Name
+    ui->tvTasks->setColumnWidth(3, 150); // Deadline
+    ui->tvTasks->setColumnWidth(4, 400); // Description
+    ui->tvTasks->setColumnWidth(5, 100); // User id
+    ui->tvTasks->setColumnWidth(6, 200); // Login
+    ui->tvTasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     connect(ui->pbGetUsers, SIGNAL(clicked(bool)), this, SLOT(get_users_list()) );
     connect(ui->pbGetTasks, SIGNAL(clicked(bool)), this, SLOT(get_tasks_list()) );
@@ -103,6 +175,72 @@ bool AdminWindow::handle_request(CommandType comm_type)
     }
 
     return true;
+}
+
+// Запрос возможных типов пользователей и статусов задач.
+bool AdminWindow::get_user_types()
+{
+    // Проверяем, был ли ранее получен список типов пользователей.
+    if (collector_ptr->user_types_received()) {
+        return true;
+    }
+
+    // Запрос списка типа пользователей.
+    if (!request_manager_ptr->send_get_typelist()) {
+        message_window_ptr->set_message(QString("Unable to send get typelist request!\n\n%1")
+                                        .arg(request_manager_ptr->get_last_error()));
+        message_window_ptr->exec();
+        return false;
+    }
+
+    // Контроль выполнения запроса.
+    if ( !handle_request(CommandType::Get)) {
+        message_window_ptr->set_message(QString("Unable to get user types!\n\n%1").arg(error_text));
+        message_window_ptr->exec();
+        return false;
+    }
+
+    // Проверяем, что получено от сервера.
+    if (collector_ptr->user_types_received()) {
+        return true;
+    }
+
+    message_window_ptr->set_message(QString("Получена пустая коллекция типов пользователей"));
+    message_window_ptr->exec();
+    return false;
+}
+
+// Запрос возможных статусов задач.
+bool AdminWindow::get_task_statuses()
+{
+    // Проверяем, был ли ранее получен список статусов задач.
+    if (collector_ptr->task_statuses_received()) {
+        return true;
+    }
+
+    // Запрос списка статусов задач.
+    if (!request_manager_ptr->send_get_statuslist()) {
+        message_window_ptr->set_message(QString("Unable to send get statuslist request!\n\n%1")
+                                            .arg(request_manager_ptr->get_last_error()));
+        message_window_ptr->exec();
+        return false;
+    }
+
+    // Контроль выполнения запроса.
+    if ( !handle_request(CommandType::Get)) {
+        message_window_ptr->set_message(QString("Unable to get task statuses!\n\n%1").arg(error_text));
+        message_window_ptr->exec();
+        return false;
+    }
+
+    // Проверяем, что получено от сервера.
+    if (collector_ptr->task_statuses_received()) {
+        return true;
+    }
+
+    message_window_ptr->set_message(QString("Получена пустая коллекция статусов задач"));
+    message_window_ptr->exec();
+    return false;
 }
 
 AdminWindow::~AdminWindow()
