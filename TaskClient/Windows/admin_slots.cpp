@@ -1,6 +1,33 @@
 #include "adminwindow.h"
 #include "ui_adminwindow.h"
 
+// Реакция на клик по строке в таблице с пользователями.
+void AdminWindow::user_clicked(const QModelIndex& index)
+{
+    if (index.row() == 0) {
+        ui->tvUsers->clearSelection();
+        return;
+    }
+
+    if (data_keeper_ptr->users_is_empty()) {
+        return;
+    }
+
+    if (!index_y_user_id_map.contains(index.row())) {
+        return;
+    }
+
+    const int user_id = index_y_user_id_map[index.row()];
+
+    ui->cbUserType->setCurrentIndex(data_keeper_ptr->get_user_data(user_id)->login_type.user_type - 1);
+
+    ui->leLogin->setText( data_keeper_ptr->get_user_data(user_id)->login_type.user_name );
+    ui->leSurename->setText( data_keeper_ptr->get_user_data(user_id)->fullname.second );
+    ui->leName->setText( data_keeper_ptr->get_user_data(user_id)->fullname.first );
+    ui->lePatronymic->setText( data_keeper_ptr->get_user_data(user_id)->fullname.patronymic );
+}
+
+// Запрос списка пользователей.
 void AdminWindow::get_users_list()
 {
     //Блокируем кнопки
@@ -93,6 +120,9 @@ void AdminWindow::get_users_list()
 
     int row_number;
 
+    // Удаляем все связи между строками таблицы и id пользователя.
+    index_y_user_id_map.clear();
+
     // Вывод данных в таблицу.
     for(auto iter = data_keeper_ptr->users_data_cib(); iter != data_keeper_ptr->users_data_cie(); ++iter) {
         users_table_model->insertRow(users_table_model->rowCount());
@@ -104,11 +134,14 @@ void AdminWindow::get_users_list()
         users_table_model->setData(users_table_model->index(row_number, 3), iter->fullname.second, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 4), iter->fullname.first, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 5), iter->fullname.patronymic, Qt::DisplayRole);
+
+        index_y_user_id_map[row_number] = iter.key();
     }
 
     unlock_buttons();
 }
 
+// Запрос списка задач.
 void AdminWindow::get_tasks_list()
 {
     // Блокируем кнопки
@@ -205,27 +238,43 @@ void AdminWindow::get_tasks_list()
         tasks_table_model->setData(tasks_table_model->index(row_number, 6),
                                    data_keeper_ptr->users_containes(iter->user_id) ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name : QString("Unknown"),
                                    Qt::DisplayRole);
-
     }
 
     unlock_buttons();
 }
 
-void AdminWindow::apply_changes()
+// Создать нового или изменить данные выбранного пользователя.
+void AdminWindow::add_or_edit_user()
 {
+    // Создать нового пользователя.
+    if (ui->rbCreateUser->isChecked()) {
+        create_user();
+        return;
+    }
 
+    // Изменить данные пользователя.
+    if (ui->rbEidtUser->isChecked()) {
+        change_user_data();
+        return;
+    }
+
+    // Задать новый пароль.
+    if (ui->rbChangePassword->isChecked()) {
+        change_password();
+        return;
+    }
 }
 
-void AdminWindow::create_user()
+// Очистить поля ввода.
+void AdminWindow::clear_fields()
 {
-
+    ui->leLogin->clear();
+    ui->leSurename->clear();
+    ui->leName->clear();
+    ui->lePatronymic->clear();
 }
 
-void AdminWindow::set_new_password()
-{
-
-}
-
+// Отправить запрос на выключение сервера.
 void AdminWindow::shutdown_server()
 {
     // Есть ли связь с сервером.

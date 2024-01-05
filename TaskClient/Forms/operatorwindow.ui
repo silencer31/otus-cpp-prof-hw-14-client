@@ -112,6 +112,9 @@
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLineEdit" name="leUserId">
     <property name="geometry">
@@ -144,6 +147,9 @@
      <font>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="labelUseIUd">

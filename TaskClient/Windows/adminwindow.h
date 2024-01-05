@@ -42,18 +42,27 @@ private: // methods
     // Запрос возможных статусов задач.
     bool get_task_statuses();
 
-private slots:
-    void get_users_list();
-
-    void get_tasks_list();
-
-    void apply_changes();
-
+    // Запрос на создание нового пользователя.
     void create_user();
 
-    void set_new_password();
+    // Запрос на изменение данных пользователя.
+    void change_user_data();
 
-    void shutdown_server();
+    // Запрос на изменение пароля.
+    void change_password();
+
+private slots:
+    void user_clicked(const QModelIndex&); // Реакция на клик по строке в таблице с пользователями.
+
+    void get_users_list(); // Запрос списка пользователей.
+
+    void get_tasks_list(); // Запрос списка задач.
+
+    void add_or_edit_user(); // Создать нового или изменить данные выбранного пользователя.
+
+    void clear_fields(); // Очистить поля ввода.
+
+    void shutdown_server(); // Отправить запрос на выключение сервера.
 
 private: // data
     Ui::AdminWindow *ui;
@@ -75,6 +84,9 @@ private: // data
     // Делегаты для таблиц.
     SimpleItemDelegate *users_table_delegate{nullptr};
     SimpleItemDelegate *tasks_table_delegate{nullptr};
+
+    QMap<int, int> index_y_user_id_map; // Для связи между строкой таблицы и id пользователя.
+
 
     std::string server_reply;
     QString error_text;

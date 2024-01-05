@@ -60,7 +60,7 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvUsers->setItemDelegate(users_table_delegate); // Устанавливаем делегат в представление.
     ui->tvUsers->horizontalHeader()->hide();
     ui->tvUsers->verticalHeader()->hide();
-    ui->tvUsers->setSelectionMode(QAbstractItemView::NoSelection);
+    //ui->tvUsers->setSelectionMode(QAbstractItemView::NoSelection);
     ui->tvUsers->setShowGrid(true);
     ui->tvUsers->setRowHeight(0, ROW_HEIGHT);
     ui->tvUsers->setColumnWidth(0, 100); // User id
@@ -70,6 +70,9 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvUsers->setColumnWidth(4, 200); // Name
     ui->tvUsers->setColumnWidth(5, 300); // Patronymic
     ui->tvUsers->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    ui->tvUsers->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tvUsers->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Настройка отображения таблицы с данными о задачах.
     ui->tvTasks->setModel(tasks_table_model);
@@ -88,26 +91,29 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvTasks->setColumnWidth(6, 200); // Login
     ui->tvTasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    // Нажатие по элементу представления.
+    connect(ui->tvUsers, SIGNAL(clicked(const QModelIndex &)),
+            this, SLOT(user_clicked(const QModelIndex &)));
     connect(ui->pbGetUsers, SIGNAL(clicked(bool)), this, SLOT(get_users_list()) );
     connect(ui->pbGetTasks, SIGNAL(clicked(bool)), this, SLOT(get_tasks_list()) );
-    connect(ui->pbApplyChanges, SIGNAL(clicked(bool)), this, SLOT(apply_changes()) );
-    connect(ui->pbNewUser, SIGNAL(clicked(bool)), this, SLOT(create_user()) );
-    connect(ui->pbSetPassword, SIGNAL(clicked(bool)), this, SLOT(set_new_password()) );
+    connect(ui->pbApply,    SIGNAL(clicked(bool)), this, SLOT(add_or_edit_user()) );
+    connect(ui->pbClear,    SIGNAL(clicked(bool)), this, SLOT(clear_fields()) );
     connect(ui->pbShutdown, SIGNAL(clicked(bool)), this, SLOT(shutdown_server()) );
-
-    connect(ui->pbExit, SIGNAL(clicked(bool)), this, SLOT(close()) );
+    connect(ui->pbExit,     SIGNAL(clicked(bool)), this, SLOT(close()) );
 
     ui->leUserId->setText(QString::number(user_id));
     ui->leUserName->setText(user_name);
+
+    ui->pbApply->setEnabled(false);
+    ui->pbClear->setEnabled(false);
 }
 
 void AdminWindow::lock_buttons()
 {
     ui->pbGetUsers->setEnabled(false);
     ui->pbGetTasks->setEnabled(false);
-    ui->pbApplyChanges->setEnabled(false);
-    ui->pbNewUser->setEnabled(false);
-    ui->pbSetPassword->setEnabled(false);
+    ui->pbApply->setEnabled(false);
+    ui->pbClear->setEnabled(false);
     ui->pbShutdown->setEnabled(false);
     ui->pbExit->setEnabled(false);
 }
@@ -116,9 +122,8 @@ void AdminWindow::unlock_buttons()
 {
     ui->pbGetUsers->setEnabled(true);
     ui->pbGetTasks->setEnabled(true);
-    ui->pbApplyChanges->setEnabled(true);
-    ui->pbNewUser->setEnabled(true);
-    ui->pbSetPassword->setEnabled(true);
+    ui->pbApply->setEnabled(true);
+    ui->pbClear->setEnabled(true);
     ui->pbShutdown->setEnabled(true);
     ui->pbExit->setEnabled(true);
 }
@@ -177,72 +182,6 @@ bool AdminWindow::handle_request(CommandType comm_type)
     }
 
     return true;
-}
-
-// Запрос возможных типов пользователей и статусов задач.
-bool AdminWindow::get_user_types()
-{
-    // Проверяем, был ли ранее получен список типов пользователей.
-    if (collector_ptr->user_types_received()) {
-        return true;
-    }
-
-    // Запрос списка типа пользователей.
-    if (!request_manager_ptr->send_get_typelist()) {
-        message_window_ptr->set_message(QString("Unable to send get typelist request!\n\n%1")
-                                        .arg(request_manager_ptr->get_last_error()));
-        message_window_ptr->exec();
-        return false;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
-        message_window_ptr->set_message(QString("Unable to get user types!\n\n%1").arg(error_text));
-        message_window_ptr->exec();
-        return false;
-    }
-
-    // Проверяем, что получено от сервера.
-    if (collector_ptr->user_types_received()) {
-        return true;
-    }
-
-    message_window_ptr->set_message(QString("Получена пустая коллекция типов пользователей"));
-    message_window_ptr->exec();
-    return false;
-}
-
-// Запрос возможных статусов задач.
-bool AdminWindow::get_task_statuses()
-{
-    // Проверяем, был ли ранее получен список статусов задач.
-    if (collector_ptr->task_statuses_received()) {
-        return true;
-    }
-
-    // Запрос списка статусов задач.
-    if (!request_manager_ptr->send_get_statuslist()) {
-        message_window_ptr->set_message(QString("Unable to send get statuslist request!\n\n%1")
-                                            .arg(request_manager_ptr->get_last_error()));
-        message_window_ptr->exec();
-        return false;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
-        message_window_ptr->set_message(QString("Unable to get task statuses!\n\n%1").arg(error_text));
-        message_window_ptr->exec();
-        return false;
-    }
-
-    // Проверяем, что получено от сервера.
-    if (collector_ptr->task_statuses_received()) {
-        return true;
-    }
-
-    message_window_ptr->set_message(QString("Получена пустая коллекция статусов задач"));
-    message_window_ptr->exec();
-    return false;
 }
 
 AdminWindow::~AdminWindow()

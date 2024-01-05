@@ -24,6 +24,17 @@ public:
         tasks_data.clear();
     }
 
+    // Узнать, пуста ли коллекция с пользователями.
+    bool users_is_empty() {
+        return users_data.isEmpty();
+    }
+
+    // Узнать, пуста ли коллекция с пользователями.
+    bool tasks_is_empty() {
+        return tasks_data.isEmpty();
+    }
+
+
     // Добавление данных пользователя.
     void add_user(const int id, const UserData& user) {
         users_data[id] = user;
