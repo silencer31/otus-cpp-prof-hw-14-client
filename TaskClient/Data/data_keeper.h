@@ -7,6 +7,11 @@
 
 #include <memory>
 
+/***********
+ *
+ *  Этот класс хранит коллекции данных о пользователях и задачах.
+ *
+ * ********/
 
 class DataKeeper
 {
@@ -45,7 +50,7 @@ public:
         tasks_data[id] = task;
     }
 
-    // Узнать, есть ли в коллекции c данными пользователей.
+    // Узнать, есть ли такой id в коллекции c данными пользователей.
     bool users_containes(const int id) {
         return users_data.contains(id);
     }
@@ -85,6 +90,9 @@ public:
     const QMap<int, TaskData>::const_iterator get_task_data(const int id) {
         return tasks_data.constFind(id);
     }
+
+    // Узнать, есть ли уже такой логин среди полученных.
+    bool user_name_received(const QString& login);
 
 private:
     QMap<int, UserData> users_data;

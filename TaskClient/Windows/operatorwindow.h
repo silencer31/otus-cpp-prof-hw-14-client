@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "messagewindow.h"
+#include "passwdwindow.h"
 #include "simple_delegate.h"
 
 #include "Data/data_keeper.h"
@@ -23,7 +24,8 @@ public:
 
     explicit OperatorWindow(const req_mngr_shared rm_ptr, const collector_shared cltr_ptr,
                             const parser_shared par_ptr, const data_keeper_shared dk_ptr,
-                            const message_win_shared mw_ptr, const QString& uname, QWidget *parent = nullptr);
+                            const message_win_shared mw_ptr, const passwd_win_shared pwd_ptr,
+                            const QString& uname, QWidget *parent = nullptr);
 
     ~OperatorWindow();
 
@@ -56,9 +58,10 @@ private: // data
     const data_keeper_shared data_keeper_ptr;
 
     const message_win_shared message_window_ptr;
+    const passwd_win_shared passwd_window_ptr;
 
-    const QString user_name;
-    const int user_id;
+    const QString own_name;
+    const int own_id;
 
     // Модели данных для таблиц
     QStandardItemModel *users_table_model; // Модель для данных о пользователях.

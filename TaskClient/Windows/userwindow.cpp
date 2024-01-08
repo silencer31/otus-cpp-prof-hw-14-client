@@ -3,7 +3,8 @@
 
 UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr_ptr,
                        const parser_shared par_ptr, const data_keeper_shared dk_ptr,
-                       const message_win_shared mw_ptr, const QString& uname, QWidget *parent)
+                       const message_win_shared mw_ptr, const passwd_win_shared pwd_ptr,
+                       const QString& uname, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::UserWindow)
     , request_manager_ptr(rm_ptr)
@@ -11,8 +12,9 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
     , parser_ptr(par_ptr)
     , data_keeper_ptr(dk_ptr)
     , message_window_ptr(mw_ptr)
-    , user_name(uname)
-    , user_id(collector_ptr->get_own_id())
+    , passwd_window_ptr(pwd_ptr)
+    , own_name(uname)
+    , own_id(collector_ptr->get_own_id())
     , tasks_table_model(new QStandardItemModel())
     , tasks_table_delegate(new SimpleItemDelegate(tasks_table_model))
 {

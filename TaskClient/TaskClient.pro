@@ -23,21 +23,20 @@ SOURCES += \
     Network/requestmanager_del.cpp \
     Network/requestmanager_get.cpp \
     Network/requestmanager_set.cpp \
+    Network/netcommunication.cpp \
+    Network/requestmanager.cpp \
     Parser/replyparser.cpp \
     Windows/admin_functions.cpp \
     Windows/admin_slots.cpp \
     Windows/operator_slots.cpp \
     Windows/simple_delegate.cpp \
     Windows/user_slots.cpp \
-    main.cpp \
-    Windows\adminwindow.cpp \
-    Windows\loginwindow.cpp \
-    Windows\messagewindow.cpp \
-    Windows\operatorwindow.cpp \
-    Windows\userwindow.cpp \
-    Network\netcommunication.cpp \
-    Network\requestmanager.cpp \
-
+    Windows/adminwindow.cpp \
+    Windows/messagewindow.cpp \
+    Windows/operatorwindow.cpp \
+    Windows/userwindow.cpp \
+    Windows/passwdwindow.cpp \
+    main.cpp
 
 HEADERS += \
     Data/collector.h \
@@ -46,21 +45,20 @@ HEADERS += \
     Data/data_types.h \
     Parser/replyparser.h \
     Windows/simple_delegate.h \
-    Windows\adminwindow.h \
-    Windows\loginwindow.h \
-    Windows\messagewindow.h \
-    Windows\operatorwindow.h \
-    Windows\userwindow.h \
-    Network\netcommunication.h \
-    Network\requestmanager.h
-
+    Windows/adminwindow.h \
+    Windows/messagewindow.h \
+    Windows/operatorwindow.h \
+    Windows/userwindow.h \
+    Windows/passwdwindow.h \
+    Network/netcommunication.h \
+    Network/requestmanager.h
 
 FORMS += \
-    Forms\adminwindow.ui \
-    Forms\loginwindow.ui \
-    Forms\messagewindow.ui \
-    Forms\operatorwindow.ui \
-    Forms\userwindow.ui
+    Forms/passwdwindow.ui \
+    Forms/adminwindow.ui \
+    Forms/messagewindow.ui \
+    Forms/operatorwindow.ui \
+    Forms/userwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

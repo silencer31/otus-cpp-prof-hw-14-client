@@ -54,7 +54,10 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
 
     const QString errtext = (reply_object.contains("errtext") ? reply_object["errtext"].toString() : QString("No error text"));
 
-    collector_ptr->set_request_error(reply_object["error"].toBool(), errtext);
+    collector_ptr->set_request_error(reply_object["error"].toBool(),
+                                     reply_object.contains("parameter")
+                                     ? QString("%1\nParameter: %2").arg(errtext, reply_object["parameter"].toString())
+                                     : errtext);
 
     // Поле result
     if ( !reply_object.contains("result")) {
@@ -68,6 +71,8 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
     }
 
     const QString details = (reply_object.contains("details") ? reply_object["details"].toString() : QString("No details"));
+
+
 
     collector_ptr->set_result(reply_object["result"].toBool(), details);
 

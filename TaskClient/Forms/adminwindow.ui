@@ -490,7 +490,7 @@
      <widget class="QPushButton" name="pbApply">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>540</x>
         <y>510</y>
         <width>200</width>
         <height>40</height>
@@ -640,7 +640,7 @@
        <rect>
         <x>30</x>
         <y>500</y>
-        <width>231</width>
+        <width>471</width>
         <height>171</height>
        </rect>
       </property>
@@ -656,7 +656,7 @@
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>30</y>
+         <y>50</y>
          <width>160</width>
          <height>28</height>
         </rect>
@@ -687,7 +687,7 @@
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>70</y>
+         <y>110</y>
          <width>160</width>
          <height>28</height>
         </rect>
@@ -717,8 +717,8 @@
       <widget class="QRadioButton" name="rbChangePassword">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>120</y>
+         <x>260</x>
+         <y>110</y>
          <width>200</width>
          <height>28</height>
         </rect>
@@ -743,6 +743,19 @@
        </property>
        <property name="text">
         <string>Change password</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rbDeleteUser">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>50</y>
+         <width>151</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Delete user</string>
        </property>
       </widget>
      </widget>

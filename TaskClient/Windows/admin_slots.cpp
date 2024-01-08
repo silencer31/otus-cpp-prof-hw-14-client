@@ -6,6 +6,14 @@ void AdminWindow::user_clicked(const QModelIndex& index)
 {
     if (index.row() == 0) {
         ui->tvUsers->clearSelection();
+
+        ui->cbUserType->setCurrentIndex(0);
+
+        ui->leLogin->clear();
+        ui->leSurename->clear();
+        ui->leName->clear();
+        ui->lePatronymic->clear();
+
         return;
     }
 
@@ -249,6 +257,12 @@ void AdminWindow::add_or_edit_user()
     // Создать нового пользователя.
     if (ui->rbCreateUser->isChecked()) {
         create_user();
+        return;
+    }
+
+    // Удалить выбранного пользователя.
+    if (ui->rbDeleteUser->isChecked()) {
+        delete_user();
         return;
     }
 

@@ -3,7 +3,8 @@
 
 AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cltr_ptr,
                          const parser_shared par_ptr, const data_keeper_shared dk_ptr,
-                         const message_win_shared mw_ptr, const QString& uname, QWidget *parent)
+                         const message_win_shared mw_ptr, const passwd_win_shared pwd_ptr,
+                         const QString& uname, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AdminWindow)
     , request_manager_ptr(rm_ptr)
@@ -11,8 +12,9 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     , parser_ptr(par_ptr)
     , data_keeper_ptr(dk_ptr)
     , message_window_ptr(mw_ptr)
-    , user_name(uname)
-    , user_id(collector_ptr->get_own_id())
+    , passwd_window_ptr(pwd_ptr)
+    , own_name(uname)
+    , own_id(collector_ptr->get_own_id())
     , users_table_model(new QStandardItemModel())
     , tasks_table_model(new QStandardItemModel())
     , users_table_delegate(new SimpleItemDelegate(users_table_model))
@@ -91,9 +93,11 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvTasks->setColumnWidth(6, 200); // Login
     ui->tvTasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    // Нажатие по элементу представления.
+    // Нажатие по строке в таблице с пользователями.
     connect(ui->tvUsers, SIGNAL(clicked(const QModelIndex &)),
             this, SLOT(user_clicked(const QModelIndex &)));
+
+    // Нажатие на кнопку.
     connect(ui->pbGetUsers, SIGNAL(clicked(bool)), this, SLOT(get_users_list()) );
     connect(ui->pbGetTasks, SIGNAL(clicked(bool)), this, SLOT(get_tasks_list()) );
     connect(ui->pbApply,    SIGNAL(clicked(bool)), this, SLOT(add_or_edit_user()) );
@@ -101,8 +105,8 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     connect(ui->pbShutdown, SIGNAL(clicked(bool)), this, SLOT(shutdown_server()) );
     connect(ui->pbExit,     SIGNAL(clicked(bool)), this, SLOT(close()) );
 
-    ui->leUserId->setText(QString::number(user_id));
-    ui->leUserName->setText(user_name);
+    ui->leUserId->setText(QString::number(own_id));
+    ui->leUserName->setText(own_name);
 
     ui->pbApply->setEnabled(false);
     ui->pbClear->setEnabled(false);
