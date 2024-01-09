@@ -32,6 +32,8 @@ public:
 
     bool parse_login_request(const QJsonObject& reply_object);
 
+    bool parse_add_request(const QJsonObject& reply_object);
+
     bool parse_get_request(const QJsonObject& reply_object);
 
     bool parse_get_username(const QJsonObject& reply_object);
@@ -45,7 +47,6 @@ public:
     bool parse_get_types(const QJsonObject& reply_object);
 
     bool parse_get_statuses(const QJsonObject& reply_object);
-
 
     bool parse_get_taskdata(const QJsonObject& reply_object);
 

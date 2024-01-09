@@ -138,6 +138,19 @@ void AdminWindow::create_user()
         return;
     }
 
+    // Добавляем нового пользователя в таблицу.
+    users_table_model->insertRow(users_table_model->rowCount());
+    const int row_number = users_table_model->rowCount()-1;
+
+    users_table_model->setData(users_table_model->index(row_number, 0), QString::number(collector_ptr->get_item_id()), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(row_number, 1), user_name, Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(row_number, 2), collector_ptr->type_description(ui->cbUserType->currentIndex()+1), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(row_number, 3), surename, Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(row_number, 4), name, Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(row_number, 5), patronymic, Qt::DisplayRole);
+
+    index_y_user_id_map[row_number] = collector_ptr->get_item_id();
+
 
     message_window_ptr->set_message(QString("User %1 has been successfully created").arg(user_name));
     message_window_ptr->exec();
@@ -189,6 +202,17 @@ void AdminWindow::delete_user()
         unlock_buttons();
         return;
     }
+
+    // Убираем пользователя из таблицы.
+    users_table_model->removeRows(selection.at(0).row(), 1);
+    ui->tvUsers->clearSelection();
+
+    // Убираем связь между id и номером строки в таблице.
+    index_y_user_id_map.remove(user_id);
+
+    // Удаляем данные пользователя.
+    data_keeper_ptr->del_user_data(user_id);
+
 
     message_window_ptr->set_message(QString("User %1 has been successfully deleted!").arg(user_to_del));
     message_window_ptr->exec();

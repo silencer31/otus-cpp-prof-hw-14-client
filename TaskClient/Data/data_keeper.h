@@ -60,6 +60,16 @@ public:
         return tasks_data.contains(id);
     }
 
+    // Удалить данные пользователя по его id.
+    void del_user_data(const int id) {
+        users_data.remove(id);
+    }
+
+    // Удалить данные задачи по её id.
+    void del_task_data(const int id) {
+        tasks_data.remove(id);
+    }
+
     // Получить итератор на начало коллекции с данными пользователей.
     QMap<int, UserData>::const_iterator users_data_cib() {
         return users_data.constBegin();

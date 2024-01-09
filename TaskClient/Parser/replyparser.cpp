@@ -115,7 +115,7 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
             last_error = QString("Command type is not add");
             return false;
         }
-        return true;
+        return parse_add_request(reply_object);
     case CommandType::Set:
         if (reply_object["command"] != "set") {
             last_error = QString("Command type is not set");
@@ -151,6 +151,22 @@ bool ReplyParser::parse_login_request(const QJsonObject& reply_object)
     collector_ptr->set_id_and_type(reply_object["user_id"].toInt(0), reply_object["user_type"].toInt(0));
 
     return true;
+}
+
+bool ReplyParser::parse_add_request(const QJsonObject& reply_object)
+{
+    if ( reply_object.contains("user_id")) {
+        collector_ptr->set_item_id(reply_object["user_id"].toInt(0));
+        return true;
+    }
+
+    if ( reply_object.contains("task_id")) {
+        collector_ptr->set_item_id(reply_object["task_id"].toInt(0));
+        return true;
+    }
+
+    last_error = QString("Field with new id has NOT been found in server reply");
+    return false;
 }
 
 bool ReplyParser::parse_get_request(const QJsonObject& reply_object)

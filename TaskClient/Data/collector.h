@@ -29,7 +29,7 @@ public:
         return request_error.error_text;
     }
 
-    // Установить наличие ошибки в запросе и описание.
+    // Записать наличие ошибки в запросе и её описание.
     void set_request_error(bool value, const QString& text);
 
     // Очистить предыдущую ошибку зароса.
@@ -46,7 +46,7 @@ public:
         return reply_result.details;
     }
 
-    // Установить результат и описание.
+    // Записать результат и детали выполнения.
     void set_result(bool result, const QString& details);
 
     // Очистить предыдущий результат.
@@ -63,7 +63,7 @@ public:
         return id_type.user_type;
     }
 
-    // Установить id и тип пользователя.
+    // Записать id и тип пользователя.
     void set_id_and_type(int id, int type);
 
     /// Логин и тип другого пользователя в базе(не свои).
@@ -234,6 +234,16 @@ public:
         return task_statuses.descriptions.constEnd();
     }
 
+    /// id, полученный от сервера после последнего запроса на создание пользователя или задачи.
+    void set_item_id(const int value) {
+        item_id = value;
+    }
+
+    // Узнать id, полученный от сервера после последнего запроса.
+    int get_item_id() {
+        return item_id;
+    }
+
 private:
     RequestError request_error;
     ReplyResult  reply_result;
@@ -245,6 +255,8 @@ private:
     IntArray     task_ids;      // get : tasklist
     IntStrMap    user_types;    // get : typelist
     IntStrMap    task_statuses; // get : statuslist
+
+    int item_id; // id, полученный от сервера на запрос создания нового пользователя или задачи.
 };
 
 using collector_shared = std::shared_ptr<Collector>;

@@ -290,7 +290,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Get Users List</string>
+       <string>Require Users List</string>
       </property>
      </widget>
      <widget class="QComboBox" name="cbUserType">
