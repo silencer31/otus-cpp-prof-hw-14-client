@@ -104,6 +104,19 @@ public:
     // Узнать, есть ли уже такой логин среди полученных.
     bool user_name_received(const QString& login);
 
+
+    /// Корректировка полученных данных.
+
+    // Изменить тип пользователя.
+    void set_user_type(const int user_id, const int user_type) {
+        users_data[user_id].login_type.user_type = user_type;
+    }
+
+    // Изменить статус задачи.
+    void set_task_status(const int task_id, const int status) {
+        tasks_data[task_id].status = status;
+    }
+
 private:
     QMap<int, UserData> users_data;
     QMap<int, TaskData> tasks_data;

@@ -50,8 +50,8 @@ private: // methods
     // Удалить выбранного пользователя.
     void delete_user();
 
-    // Запрос на изменение данных пользователя.
-    void change_user_data();
+    // Запрос на изменение типа пользователя.
+    void change_user_type();
 
     // Запрос на изменение пароля.
     void change_password();

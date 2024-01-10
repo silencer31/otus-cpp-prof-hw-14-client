@@ -98,6 +98,7 @@ void AdminWindow::create_user()
     }
 
     // Запрашиваем пароль для нового пользователя.
+    passwd_window_ptr->clear_fields();
     if ( passwd_window_ptr->exec() == QDialog::Rejected ) {
         return;
     }
@@ -163,7 +164,7 @@ void AdminWindow::delete_user()
     QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
-        message_window_ptr->set_message(QString("Choose a user before deletion!"));
+        message_window_ptr->set_message(QString("Choose a user before deletion"));
         message_window_ptr->exec();
         return;
     }
@@ -214,19 +215,147 @@ void AdminWindow::delete_user()
     data_keeper_ptr->del_user_data(user_id);
 
 
-    message_window_ptr->set_message(QString("User %1 has been successfully deleted!").arg(user_to_del));
+    message_window_ptr->set_message(QString("User %1 has been successfully deleted").arg(user_to_del));
     message_window_ptr->exec();
     unlock_buttons();
 }
 
 // Запрос на изменение данных пользователя.
-void AdminWindow::change_user_data()
+void AdminWindow::change_user_type()
 {
+    QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
+    if (selection.isEmpty()) {
+        message_window_ptr->set_message(QString("Choose a user to change user type"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    if (!index_y_user_id_map.contains(selection.at(0).row())) {
+        message_window_ptr->set_message(QString("Unexpected index error!"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    const int user_id = index_y_user_id_map[selection.at(0).row()];
+
+    if (!data_keeper_ptr->users_containes(user_id)) {
+        return;
+    }
+
+    // Проверяем, нет ли попытки изменить свой тип.
+    if (user_id == own_id) {
+        message_window_ptr->set_message(QString("You are not able to change your type!"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    // Выбранный тип.
+    const int user_type = ui->cbUserType->currentIndex()+1;
+
+    // Проверяем, не совпадает ли выбранный тип с уже установленным.
+    if (user_type == data_keeper_ptr->get_user_data(user_id)->login_type.user_type) {
+        message_window_ptr->set_message(QString("Old and new user types are the same"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    lock_buttons();
+
+    // Отправляем запрос на изменение типа пользователя.
+    if ( !request_manager_ptr->send_set_usertype(user_id, user_type) ) {
+        message_window_ptr->set_message(request_manager_ptr->get_last_error());
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Контроль выполнения запроса.
+    if ( !handle_request(CommandType::Set)) {
+        message_window_ptr->set_message(QString("Unable to change type of the choosen user\n%1").arg(error_text));
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Запоминаем новый тип пользователя.
+    data_keeper_ptr->set_user_type(user_id, user_type);
+
+    // Обновляем содержимое ячейки в таблице.
+    users_table_model->setData(users_table_model->index(selection.at(0).row(), 2), collector_ptr->type_description(user_type), Qt::DisplayRole);
+
+    message_window_ptr->set_message(QString("User type has been successfully changed to %1")
+                                        .arg(collector_ptr->type_description(user_type)));
+    message_window_ptr->exec();
+    unlock_buttons();
 }
 
 // Запрос на изменение пароля.
 void AdminWindow::change_password()
 {
+    QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
+    if (selection.isEmpty()) {
+        message_window_ptr->set_message(QString("Choose a user to change password"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    if (!index_y_user_id_map.contains(selection.at(0).row())) {
+        message_window_ptr->set_message(QString("Unexpected index error!"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    const int user_id = index_y_user_id_map[selection.at(0).row()];
+
+    if (!data_keeper_ptr->users_containes(user_id)) {
+        return;
+    }
+
+    // Запрашиваем новый пароль.
+    passwd_window_ptr->clear_fields();
+    if ( passwd_window_ptr->exec() == QDialog::Rejected ) {
+        return;
+    }
+
+    const QString pass_value_1 = passwd_window_ptr->get_first_value();
+    const QString pass_value_2 = passwd_window_ptr->get_second_value();
+
+    // Не должно быть пустого значения пароля.
+    if (pass_value_1.isEmpty() || pass_value_2.isEmpty()) {
+        message_window_ptr->set_message(QString("Both password fields have to be filled in!"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    // Оба значения должны совпадать.
+    if (pass_value_1 != pass_value_2) {
+        message_window_ptr->set_message(QString("Password values do not match!"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    lock_buttons();
+
+    // Отправляем запрос на изменение пароля пользователя.
+    if ( !request_manager_ptr->send_set_password(user_id, pass_value_1) ) {
+        message_window_ptr->set_message(request_manager_ptr->get_last_error());
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Контроль выполнения запроса.
+    if ( !handle_request(CommandType::Set)) {
+        message_window_ptr->set_message(QString("Unable to change password for the choosen user\n%1").arg(error_text));
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    message_window_ptr->set_message(QString("Password for user %1 has been successfully changed")
+                                        .arg(data_keeper_ptr->get_user_data(user_id)->login_type.user_name));
+    message_window_ptr->exec();
+    unlock_buttons();
 }

@@ -176,7 +176,11 @@ void AdminWindow::get_tasks_list()
     }
 
     // Запрос списка id задач.
-    if (!request_manager_ptr->send_get_tasklist()) {
+    bool result = (ui->checkbOnlyOwn->isChecked()
+                  ? request_manager_ptr->send_get_tasklist(own_id)
+                  : request_manager_ptr->send_get_tasklist());
+
+    if (!result) {
         message_window_ptr->set_message(QString("Unable to send get tasklist request!\n\n%1")
                                             .arg(request_manager_ptr->get_last_error()));
         message_window_ptr->exec();
@@ -244,7 +248,9 @@ void AdminWindow::get_tasks_list()
         tasks_table_model->setData(tasks_table_model->index(row_number, 5), QString::number(iter->user_id), Qt::DisplayRole);
 
         tasks_table_model->setData(tasks_table_model->index(row_number, 6),
-                                   data_keeper_ptr->users_containes(iter->user_id) ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name : QString("Unknown"),
+                                   data_keeper_ptr->users_containes(iter->user_id)
+                                       ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name
+                                       : ((iter->user_id == own_id) ? own_name : QString("Unknown")),
                                    Qt::DisplayRole);
     }
 
@@ -266,9 +272,9 @@ void AdminWindow::add_or_edit_user()
         return;
     }
 
-    // Изменить данные пользователя.
-    if (ui->rbEidtUser->isChecked()) {
-        change_user_data();
+    // Изменить тип пользователя.
+    if (ui->rbChangeType->isChecked()) {
+        change_user_type();
         return;
     }
 
