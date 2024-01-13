@@ -5,15 +5,8 @@
 void AdminWindow::user_clicked(const QModelIndex& index)
 {
     if (index.row() == 0) {
-        ui->tvUsers->clearSelection();
-
+        clear_fields();
         ui->cbUserType->setCurrentIndex(0);
-
-        ui->leLogin->clear();
-        ui->leSurename->clear();
-        ui->leName->clear();
-        ui->lePatronymic->clear();
-
         return;
     }
 
@@ -292,6 +285,8 @@ void AdminWindow::clear_fields()
     ui->leSurename->clear();
     ui->leName->clear();
     ui->lePatronymic->clear();
+
+    ui->tvUsers->clearSelection();
 }
 
 // Отправить запрос на выключение сервера.

@@ -54,6 +54,9 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
     connect(ui->pbNewTask, SIGNAL(clicked(bool)), this, SLOT(create_task()) );
 
     connect(ui->pbExit, SIGNAL(clicked(bool)), this, SLOT(close()) );
+
+    ui->leOwnId->setText(QString::number(own_id));
+    ui->leOwnLogin->setText(own_name);
 }
 
 void UserWindow::lock_buttons()

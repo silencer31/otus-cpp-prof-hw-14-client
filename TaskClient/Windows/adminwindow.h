@@ -57,17 +57,23 @@ private: // methods
     void change_password();
 
 private slots:
-    void user_clicked(const QModelIndex&); // Реакция на клик по строке в таблице с пользователями.
+    // Реакция на клик по строке в таблице с пользователями.
+    void user_clicked(const QModelIndex&);
 
-    void get_users_list(); // Запрос списка пользователей.
+    // Запрос списка пользователей.
+    void get_users_list();
 
-    void get_tasks_list(); // Запрос списка задач.
+    // Запрос списка задач.
+    void get_tasks_list();
 
-    void add_or_edit_user(); // Создать нового или изменить данные выбранного пользователя.
+    // Создать нового или изменить данные выбранного пользователя.
+    void add_or_edit_user();
 
-    void clear_fields(); // Очистить поля ввода.
+    // Очистить поля ввода.
+    void clear_fields();
 
-    void shutdown_server(); // Отправить запрос на выключение сервера.
+    // Отправить запрос на выключение сервера.
+    void shutdown_server();
 
 private: // data
     Ui::AdminWindow *ui;

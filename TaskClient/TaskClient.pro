@@ -28,6 +28,7 @@ SOURCES += \
     Parser/replyparser.cpp \
     Windows/admin_functions.cpp \
     Windows/admin_slots.cpp \
+    Windows/operator_functions.cpp \
     Windows/operator_slots.cpp \
     Windows/simple_delegate.cpp \
     Windows/user_slots.cpp \

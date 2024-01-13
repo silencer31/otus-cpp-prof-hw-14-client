@@ -52,9 +52,11 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
         return false;
     }
 
+    const bool request_error = reply_object["error"].toBool();
+
     const QString errtext = (reply_object.contains("errtext") ? reply_object["errtext"].toString() : QString("No error text"));
 
-    collector_ptr->set_request_error(reply_object["error"].toBool(),
+    collector_ptr->set_request_error(request_error,
                                      reply_object.contains("parameter")
                                      ? QString("%1\nParameter: %2").arg(errtext, reply_object["parameter"].toString())
                                      : errtext);
@@ -70,12 +72,18 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
         return false;
     }
 
+    const bool request_result = reply_object["result"].toBool();
+
+    // Поле details
     const QString details = (reply_object.contains("details") ? reply_object["details"].toString() : QString("No details"));
 
+    // Записываем результат выполнения и детали.
+    collector_ptr->set_result( request_result, details);
 
+    // Если подтверждено наличие ошибки в запросе, выходим.
+    if (request_error) { return true; }
 
-    collector_ptr->set_result(reply_object["result"].toBool(), details);
-
+    // Анализ ответа от сервера.
     switch(command) {
     case CommandType::Unknown:
         last_error = QString("Bad command type");
@@ -91,7 +99,7 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
             last_error = QString("Command type is not login");
             return false;
         }
-        return (collector_ptr->get_result() ? parse_login_request(reply_object) : true);
+        return (request_result ? parse_login_request(reply_object) : true);
     case CommandType::Closedown:
         if (reply_object["command"] != "closedown") {
             last_error = QString("Command type is not closedown");
@@ -109,13 +117,13 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
             last_error = QString("Command type is not get");
             return false;
         }
-        return parse_get_request(reply_object);
+        return (request_result ? parse_get_request(reply_object) : true);
     case CommandType::Add:
         if (reply_object["command"] != "add") {
             last_error = QString("Command type is not add");
             return false;
         }
-        return parse_add_request(reply_object);
+        return (request_result ? parse_add_request(reply_object) : true);
     case CommandType::Set:
         if (reply_object["command"] != "set") {
             last_error = QString("Command type is not set");

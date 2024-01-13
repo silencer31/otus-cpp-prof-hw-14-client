@@ -104,6 +104,8 @@ public:
     // Узнать, есть ли уже такой логин среди полученных.
     bool user_name_received(const QString& login);
 
+    // Узнать, есть ли уже такая задача среди полученных.
+    bool task_name_received(const QString& task_name);
 
     /// Корректировка полученных данных.
 

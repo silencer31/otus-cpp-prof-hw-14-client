@@ -50,7 +50,7 @@
      <string>Exit</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leUserId">
+   <widget class="QLineEdit" name="leOwnId">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -86,12 +86,12 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leUserName">
+   <widget class="QLineEdit" name="leOwnLogin">
     <property name="geometry">
      <rect>
       <x>360</x>
       <y>20</y>
-      <width>120</width>
+      <width>200</width>
       <height>28</height>
      </rect>
     </property>
@@ -103,13 +103,13 @@
     </property>
     <property name="minimumSize">
      <size>
-      <width>120</width>
+      <width>200</width>
       <height>28</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
-      <width>120</width>
+      <width>200</width>
       <height>28</height>
      </size>
     </property>
@@ -122,7 +122,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="labelUseIUd">
+   <widget class="QLabel" name="labelOwnId">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -155,10 +155,10 @@
      </font>
     </property>
     <property name="text">
-     <string>User Id</string>
+     <string>Own Id</string>
     </property>
    </widget>
-   <widget class="QLabel" name="labelUserName">
+   <widget class="QLabel" name="labelOwnLogin">
     <property name="geometry">
      <rect>
       <x>240</x>
@@ -185,7 +185,7 @@
      </font>
     </property>
     <property name="text">
-     <string>User Name</string>
+     <string>Own Login</string>
     </property>
    </widget>
    <widget class="QTableView" name="tvTasks">

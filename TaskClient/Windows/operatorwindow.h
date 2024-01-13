@@ -36,18 +36,35 @@ private: // methods
 
     bool handle_request(CommandType comm_type);
 
+    // Запрос возможных типов пользователей.
+    bool get_user_types();
+
+    // Запрос возможных статусов задач.
+    bool get_task_statuses();
+
+    void create_task(); // Создать новую задачу.
+
+    void delete_task(); // Удалить выбранную задачу.
+
+    void change_task_status(); // Изменить статус задачи.
+
+    void set_task_deadline(); // Задать новую дату, до которой д/б выполнена задача.
+
+    void appoint_user(); // Назначить другого пользователя на задачу.
+
 private slots:
-    void get_tasks_list();
+    void user_clicked(const QModelIndex&); // Реакция на клик по строке в таблице с пользователями.
 
-    void appoint_user();
+    void task_clicked(const QModelIndex&); // Реакция на клик по строке в таблице с задачами.
 
-    void set_task_status();
+    void get_users_list(); // Запрос списка пользователей.
 
-    void delete_task();
+    void get_tasks_list(); // Запрос списка задач.
 
-    void set_deadline();
+    void add_or_edit_task(); // Создать новую или изменить данные выбранной задачи.
 
-    void create_task();
+    void clear_fields(); // Очистить поля ввода.
+
 
 private: // data
     Ui::OperatorWindow *ui;
@@ -70,6 +87,10 @@ private: // data
     // Делегаты для таблиц.
     SimpleItemDelegate *users_table_delegate{nullptr};
     SimpleItemDelegate *tasks_table_delegate{nullptr};
+
+    QMap<int, int> index_y_task_id_map; // Для связи между строкой таблицы и id задачи.
+    QMap<int, int> index_y_user_id_map; // Для связи между строкой таблицы и id пользователя.
+
 
     std::string server_reply;
     QString error_text;

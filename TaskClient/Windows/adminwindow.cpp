@@ -62,7 +62,6 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvUsers->setItemDelegate(users_table_delegate); // Устанавливаем делегат в представление.
     ui->tvUsers->horizontalHeader()->hide();
     ui->tvUsers->verticalHeader()->hide();
-    //ui->tvUsers->setSelectionMode(QAbstractItemView::NoSelection);
     ui->tvUsers->setShowGrid(true);
     ui->tvUsers->setRowHeight(0, ROW_HEIGHT);
     ui->tvUsers->setColumnWidth(0, 100); // User id
@@ -72,8 +71,8 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvUsers->setColumnWidth(4, 200); // Name
     ui->tvUsers->setColumnWidth(5, 300); // Patronymic
     ui->tvUsers->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
     ui->tvUsers->setSelectionMode(QAbstractItemView::SingleSelection);
+    //ui->tvUsers->setSelectionMode(QAbstractItemView::NoSelection);
     ui->tvUsers->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Настройка отображения таблицы с данными о задачах.
@@ -81,7 +80,7 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvTasks->setItemDelegate(tasks_table_delegate); // Устанавливаем делегат в представление.
     ui->tvTasks->horizontalHeader()->hide();
     ui->tvTasks->verticalHeader()->hide();
-    ui->tvTasks->setSelectionMode(QAbstractItemView::NoSelection);
+    //ui->tvTasks->setSelectionMode(QAbstractItemView::NoSelection);
     ui->tvTasks->setShowGrid(true);
     ui->tvTasks->setRowHeight(0, ROW_HEIGHT);
     ui->tvTasks->setColumnWidth(0, 100); // Task id
@@ -105,8 +104,8 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     connect(ui->pbShutdown, SIGNAL(clicked(bool)), this, SLOT(shutdown_server()) );
     connect(ui->pbExit,     SIGNAL(clicked(bool)), this, SLOT(close()) );
 
-    ui->leUserId->setText(QString::number(own_id));
-    ui->leUserName->setText(own_name);
+    ui->leOwnId->setText(QString::number(own_id));
+    ui->leOwnLogin->setText(own_name);
 
     ui->pbApply->setEnabled(false);
     ui->pbClear->setEnabled(false);
