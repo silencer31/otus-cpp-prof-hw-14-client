@@ -31,6 +31,7 @@ SOURCES += \
     Windows/operator_functions.cpp \
     Windows/operator_slots.cpp \
     Windows/simple_delegate.cpp \
+    Windows/user_functions.cpp \
     Windows/user_slots.cpp \
     Windows/adminwindow.cpp \
     Windows/messagewindow.cpp \

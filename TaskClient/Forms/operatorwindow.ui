@@ -267,6 +267,9 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
       <property name="styleSheet">
        <string notr="true">#tvTasks {
 	border: 1px solid rgb(180, 180, 180);
@@ -905,6 +908,11 @@
         <height>28</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
       <property name="readOnly">
        <bool>true</bool>
       </property>
@@ -1177,6 +1185,9 @@
         <width>1480</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">#tvUsers {

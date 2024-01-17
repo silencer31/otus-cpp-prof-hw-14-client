@@ -36,6 +36,11 @@ struct IdType
 // get : username
 struct LoginType
 {
+    LoginType() = default;
+
+    explicit LoginType(const QString& un, const int& ut)
+        : user_name(un), user_type(ut) {}
+
     QString user_name;
     int user_type;
 };
@@ -43,6 +48,11 @@ struct LoginType
 // get : fullname
 struct Fullname
 {
+    Fullname() = default;
+
+    explicit Fullname(const QString& sval, const QString& fval, const QString& pval)
+        : second(sval), first(fval), patronymic(pval) {}
+
     QString second; // Фамилия.
     QString first;  // Имя.
     QString patronymic; // Отчество.
@@ -51,6 +61,9 @@ struct Fullname
 struct UserData
 {
     UserData() = default;
+
+    /*explicit UserData(const QString& un, const int& ut, const QString& sval, const QString& fval, const QString& pval)
+        : login_type.user_name(un), login_type.user_type(ut) {}*/
 
     explicit UserData(const LoginType& lt, const Fullname& fn)
         : login_type(lt), fullname(fn) {}
@@ -62,6 +75,11 @@ struct UserData
 // get : taskdata
 struct TaskData
 {
+    TaskData() = default;
+
+    explicit TaskData(const int& uid, const int& st, const QString& dlval, const QString& nval, const QString& descval)
+        : user_id(uid), status(st), deadline(dlval), name(nval), description(descval) {}
+
     int user_id;
     int status;
     QString deadline;

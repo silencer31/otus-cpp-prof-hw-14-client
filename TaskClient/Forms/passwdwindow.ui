@@ -58,6 +58,11 @@
      <height>32</height>
     </size>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
   </widget>
   <widget class="QLineEdit" name="leSecond">
    <property name="geometry">
@@ -85,6 +90,11 @@
      <width>368</width>
      <height>32</height>
     </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
   </widget>
   <widget class="QPushButton" name="pbOk">

@@ -120,10 +120,12 @@ void AdminWindow::create_user()
         return;
     }
 
+    const int user_type = ui->cbUserType->currentIndex()+1;
+
     lock_buttons();
 
     // Отправляем запрос на создание нового пользователя.
-    if ( !request_manager_ptr->send_add_user(user_name, (ui->cbUserType->currentIndex()+1), pass_value_1,
+    if ( !request_manager_ptr->send_add_user(user_name, user_type, pass_value_1,
                                              surename, name, patronymic) ) {
         message_window_ptr->set_message(request_manager_ptr->get_last_error());
         message_window_ptr->exec();
@@ -139,19 +141,24 @@ void AdminWindow::create_user()
         return;
     }
 
+    // Добавляем нового пользователя в коллекцию данных пользователей.
+    const UserData user_data{ LoginType(user_name, user_type), Fullname(surename, name, patronymic) };
+    const int new_id = collector_ptr->get_item_id();
+
+    data_keeper_ptr->add_user(new_id, user_data);
+
     // Добавляем нового пользователя в таблицу.
     users_table_model->insertRow(users_table_model->rowCount());
     const int row_number = users_table_model->rowCount()-1;
 
-    users_table_model->setData(users_table_model->index(row_number, 0), QString::number(collector_ptr->get_item_id()), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(row_number, 0), QString::number(new_id), Qt::DisplayRole);
     users_table_model->setData(users_table_model->index(row_number, 1), user_name, Qt::DisplayRole);
-    users_table_model->setData(users_table_model->index(row_number, 2), collector_ptr->type_description(ui->cbUserType->currentIndex()+1), Qt::DisplayRole);
+    users_table_model->setData(users_table_model->index(row_number, 2), collector_ptr->type_description(user_type), Qt::DisplayRole);
     users_table_model->setData(users_table_model->index(row_number, 3), surename, Qt::DisplayRole);
     users_table_model->setData(users_table_model->index(row_number, 4), name, Qt::DisplayRole);
     users_table_model->setData(users_table_model->index(row_number, 5), patronymic, Qt::DisplayRole);
 
-    index_y_user_id_map[row_number] = collector_ptr->get_item_id();
-
+    index_y_user_id_map[row_number] = new_id;
 
     message_window_ptr->set_message(QString("User %1 has been successfully created").arg(user_name));
     message_window_ptr->exec();
@@ -164,7 +171,7 @@ void AdminWindow::delete_user()
     QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
-        message_window_ptr->set_message(QString("Choose a user before deletion"));
+        message_window_ptr->set_message(QString("Choose a user to delete"));
         message_window_ptr->exec();
         return;
     }
@@ -187,6 +194,8 @@ void AdminWindow::delete_user()
     const QString user_to_del = data_keeper_ptr->get_user_data(user_id)->login_type.user_name;
 
     lock_buttons();
+
+    // При удалении пользователя, все задачи, которые были на него назначены должны перейти в статус "not appointed".
 
     // Отправляем запрос на удаление пользователя.
     if ( !request_manager_ptr->send_del_user(user_id) ) {
@@ -213,6 +222,11 @@ void AdminWindow::delete_user()
 
     // Удаляем данные пользователя.
     data_keeper_ptr->del_user_data(user_id);
+
+    // Всем задачам, на которые был назначен пользователь ставим статус "Not appointed" и user_id = 0.
+    data_keeper_ptr->reset_user_tasks(user_id);
+
+    // Изменяем отображение в таблице.
 
 
     message_window_ptr->set_message(QString("User %1 has been successfully deleted").arg(user_to_del));

@@ -328,6 +328,9 @@ void OperatorWindow::add_or_edit_task()
         appoint_user();
         return;
     }
+
+    message_window_ptr->set_message(QString("Choose an action"));
+    message_window_ptr->exec();
 }
 
 // Очистить поля ввода.

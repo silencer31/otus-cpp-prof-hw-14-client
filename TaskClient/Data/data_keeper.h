@@ -119,6 +119,9 @@ public:
         tasks_data[task_id].status = status;
     }
 
+    // Для всех задач, на которые назначен переданный user_id установить user_id = 0 и сбросить статус на Not appointed.
+    void reset_user_tasks(const int user_id);
+
 private:
     QMap<int, UserData> users_data;
     QMap<int, TaskData> tasks_data;
