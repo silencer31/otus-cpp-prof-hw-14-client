@@ -106,11 +106,9 @@ int main(int argc, char *argv[])
     const admin_win_unique admin_window_ptr(new AdminWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,
                                                             message_window_ptr, passwd_window_ptr, user_name));
 
-
     // Окно для задач оператора базы данных.
     const operator_win_unique operator_window_ptr(new OperatorWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,
                                                                      message_window_ptr, passwd_window_ptr, user_name));
-
 
     // Окно для задач обычного пользователя.
     const user_win_unique user_window_ptr(new UserWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,

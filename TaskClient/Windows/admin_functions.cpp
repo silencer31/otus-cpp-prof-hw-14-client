@@ -217,17 +217,30 @@ void AdminWindow::delete_user()
     users_table_model->removeRows(selection.at(0).row(), 1);
     ui->tvUsers->clearSelection();
 
+    // Корректируем связи между номером строки и id.
+    for(auto iter = index_y_user_id_map.find(user_id) ; iter != (index_y_user_id_map.end() - 1); ++iter ) {
+        *iter = (iter + 1).value();
+    }
+
     // Убираем связь между id и номером строки в таблице.
     index_y_user_id_map.remove(user_id);
 
     // Удаляем данные пользователя.
     data_keeper_ptr->del_user_data(user_id);
 
-    // Всем задачам, на которые был назначен пользователь ставим статус "Not appointed" и user_id = 0.
-    data_keeper_ptr->reset_user_tasks(user_id);
-
     // Изменяем отображение в таблице.
+    for(auto iter = index_y_task_id_map.cbegin(); iter != index_y_task_id_map.cend(); ++iter) {
+        if (data_keeper_ptr->get_task_data(iter.value())->user_id != user_id) {
+            continue;
+        }
 
+        tasks_table_model->setData(tasks_table_model->index(iter.key(), 1), collector_ptr->status_description(1), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(iter.key(), 5), QString("0"), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(iter.key(), 6), QString("No user"), Qt::DisplayRole);
+    }
+
+    // Всем задачам, на которые был назначен пользователь ставим статус "Not appointed" и user_id = 0.
+    data_keeper_ptr->reset_tasks_status(user_id);
 
     message_window_ptr->set_message(QString("User %1 has been successfully deleted").arg(user_to_del));
     message_window_ptr->exec();

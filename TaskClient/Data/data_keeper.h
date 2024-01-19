@@ -119,8 +119,19 @@ public:
         tasks_data[task_id].status = status;
     }
 
+    // Назначение пользователя на задачу.
+    void set_task_user(const int task_id, const int user_id) {
+        tasks_data[task_id].user_id = user_id;
+    }
+
+    // Сброс назначенного пользователя у задачи.
+    void reset_task_user(const int task_id) {
+        tasks_data[task_id].user_id = 0;
+    }
+
     // Для всех задач, на которые назначен переданный user_id установить user_id = 0 и сбросить статус на Not appointed.
-    void reset_user_tasks(const int user_id);
+    // Используется при удалении пользователя с переданным user_id.
+    void reset_tasks_status(const int user_id);
 
 private:
     QMap<int, UserData> users_data;

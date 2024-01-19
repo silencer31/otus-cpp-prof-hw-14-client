@@ -11,6 +11,9 @@ MessageWindow::MessageWindow(QWidget *parent) :
     setWindowFlags(Qt::WindowTitleHint | Qt::ToolTip);
 
     connect(ui->pbConfirm, SIGNAL(clicked(bool)), this, SLOT(accept()) );
+    connect(ui->pbConfirm, SIGNAL(returnPressed()), this, SLOT(accept()) );
+
+    ui->pbConfirm->setFocus();
 }
 
 MessageWindow::~MessageWindow()
@@ -26,4 +29,6 @@ void MessageWindow::set_message(const QString& message)
         ui->messageField->append(str);
         ui->messageField->setAlignment(Qt::AlignCenter);
     }
+
+    ui->pbConfirm->setFocus();
 }

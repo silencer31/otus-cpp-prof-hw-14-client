@@ -25,7 +25,7 @@ bool DataKeeper::task_name_received(const QString& task_name)
 }
 
 // Для всех задач, на которые назначен переданный user_id установить user_id = 0 и сбросить статус на Not appointed.
-void DataKeeper::reset_user_tasks(const int user_id)
+void DataKeeper::reset_tasks_status(const int user_id)
 {
     for(auto iter = tasks_data.begin(); iter != tasks_data.end(); ++iter) {
         if (user_id != iter->user_id) {

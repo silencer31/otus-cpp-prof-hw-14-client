@@ -119,10 +119,10 @@ void AdminWindow::get_users_list()
     // Очищаем таблицу от предыдущих строк.
     users_table_model->removeRows(1, users_table_model->rowCount()-1);
 
-    int row_number;
-
     // Удаляем все связи между строками таблицы и id пользователя.
     index_y_user_id_map.clear();
+
+    int row_number;
 
     // Вывод данных в таблицу.
     for(auto iter = data_keeper_ptr->users_data_cib(); iter != data_keeper_ptr->users_data_cie(); ++iter) {
@@ -228,6 +228,9 @@ void AdminWindow::get_tasks_list()
     // Очищаем таблицу от предыдущих строк.
     tasks_table_model->removeRows(1, tasks_table_model->rowCount()-1);
 
+    // Очищаем коллекцию связей id задачи и номера строки в таблице.
+    index_y_task_id_map.clear();
+
     // Вывод данных в таблицу.
     for(auto iter = data_keeper_ptr->tasks_data_cib(); iter != data_keeper_ptr->tasks_data_cie(); ++iter) {
         tasks_table_model->insertRow(tasks_table_model->rowCount());
@@ -245,6 +248,8 @@ void AdminWindow::get_tasks_list()
                                        ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name
                                        : ((iter->user_id == own_id) ? own_name : QString("Unknown")),
                                    Qt::DisplayRole);
+
+        index_y_task_id_map[row_number] = iter.key();
     }
 
     unlock_buttons();

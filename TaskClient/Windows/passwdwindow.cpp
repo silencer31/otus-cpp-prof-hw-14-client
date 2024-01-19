@@ -10,8 +10,10 @@ PasswdWindow::PasswdWindow(QWidget *parent)
     // Убирает верхний хэдер окна.
     setWindowFlags(Qt::WindowTitleHint | Qt::ToolTip);
 
-    connect(ui->pbOk,     SIGNAL(clicked(bool)), this, SLOT(accept()) );
-    connect(ui->pbCancel, SIGNAL(clicked(bool)), this, SLOT(reject()) );
+    connect(ui->pbOk,     SIGNAL(clicked(bool)),   this, SLOT(accept()) );
+    connect(ui->pbCancel, SIGNAL(clicked(bool)),   this, SLOT(reject()) );
+    connect(ui->leFirst,  SIGNAL(returnPressed()), this, SLOT(accept()) );
+    connect(ui->leSecond, SIGNAL(returnPressed()), this, SLOT(accept()) );
 }
 
 QString PasswdWindow::get_first_value()

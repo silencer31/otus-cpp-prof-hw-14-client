@@ -198,8 +198,14 @@ void OperatorWindow::delete_task()
     tasks_table_model->removeRows(selection.at(0).row(), 1);
     ui->tvTasks->clearSelection();
 
-    // Убираем связь между id и номером строки в таблице.
+    // Корректируем связи между номером строки и id.
+    for(auto iter = index_y_task_id_map.find(task_id) ; iter != (index_y_task_id_map.end() - 1); ++iter ) {
+        *iter = (iter + 1).value();
+    }
+
+    // Удаляем связь строки и task_id.
     index_y_task_id_map.remove(task_id);
+
 
     // Удаляем данные задачи.
     data_keeper_ptr->del_task_data(task_id);
@@ -230,6 +236,13 @@ void OperatorWindow::change_task_status()
 
     const int task_id = index_y_task_id_map[selection.at(0).row()];
     const QString task_name = data_keeper_ptr->get_task_data(task_id)->name;
+
+    // Нельзя изменять статус задачи, если не назначен исполнитель.
+    if (data_keeper_ptr->get_task_data(task_id)->user_id == 0) {
+        message_window_ptr->set_message(QString("Appoint a user before changing status"));
+        message_window_ptr->exec();
+        return;
+    }
 
     const int status = ui->cbTaskStatus->currentIndex()+1;
 
@@ -262,6 +275,11 @@ void OperatorWindow::change_task_status()
 
     // Запоминаем новый статус задачи.
     data_keeper_ptr->set_task_status(task_id, status);
+
+    // Если новый статус "Not appointed", присваиваем у задачи user_id = 0.
+    if ( status == 1 ) {
+        data_keeper_ptr->reset_task_user(task_id);
+    }
 
     // Обновляем содержимое ячейки в таблице.
     tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 1), collector_ptr->status_description(status), Qt::DisplayRole);
