@@ -71,4 +71,19 @@ bool RequestManager::send_set_taskuser(const int task_id, const int user_id)
     return net_communication_ptr->send_message(json_document.toJson().constData(), json_document.toJson().length());
 }
 
+bool RequestManager::send_set_deadline(const int task_id, const QString& deadline)
+{
+    current_request = CommandType::Set;
 
+    QJsonDocument json_document;
+    QJsonObject   json_object;
+
+    json_object["command"] = QString("set");
+    json_object["type"] = QString("deadline");
+    json_object["task_id"] = task_id;
+    json_object["deadline"] = deadline;
+
+    json_document.setObject(json_object);
+
+    return net_communication_ptr->send_message(json_document.toJson().constData(), json_document.toJson().length());
+}

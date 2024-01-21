@@ -15,11 +15,7 @@ void OperatorWindow::user_clicked(const QModelIndex& index)
         return;
     }
 
-    if (!index_y_user_id_map.contains(index.row())) {
-        return;
-    }
-
-    const int user_id = index_y_user_id_map[index.row()];
+    const int user_id = users_table_model->item(index.row())->data().toInt();
 
     ui->leUserId->setText( QString::number(user_id) );
     ui->leUserName->setText( data_keeper_ptr->get_user_data(user_id)->login_type.user_name );
@@ -40,11 +36,7 @@ void OperatorWindow::task_clicked(const QModelIndex& index)
         return;
     }
 
-    if (!index_y_task_id_map.contains(index.row())) {
-        return;
-    }
-
-    const int task_id = index_y_task_id_map[index.row()];
+    const int task_id = tasks_table_model->item(index.row())->data().toInt();
 
     ui->leTaskName->setText( data_keeper_ptr->get_task_data(task_id)->name );
     ui->leDeadLine->setText( data_keeper_ptr->get_task_data(task_id)->deadline );
@@ -144,9 +136,6 @@ void OperatorWindow::get_users_list()
     // Очищаем таблицу от предыдущих строк.
     users_table_model->removeRows(1, users_table_model->rowCount()-1);
 
-    // Удаляем все связи между строками таблицы и id пользователя.
-    index_y_user_id_map.clear();
-
     int row_number;
 
     // Вывод данных в таблицу.
@@ -160,8 +149,6 @@ void OperatorWindow::get_users_list()
         users_table_model->setData(users_table_model->index(row_number, 3), iter->fullname.second, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 4), iter->fullname.first, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 5), iter->fullname.patronymic, Qt::DisplayRole);
-
-        index_y_user_id_map[row_number] = iter.key();
     }
 
     unlock_buttons();
@@ -170,17 +157,11 @@ void OperatorWindow::get_users_list()
 // Запрос списка задач.
 void OperatorWindow::get_tasks_list()
 {
-    QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
+    const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (ui->rbChoosen->isChecked()) {
         if (selection.isEmpty()) {
             message_window_ptr->set_message(QString("Choose a user to request tasks for"));
-            message_window_ptr->exec();
-            return;
-        }
-
-        if (!index_y_user_id_map.contains(selection.at(0).row())) {
-            message_window_ptr->set_message(QString("Unexpected index error!"));
             message_window_ptr->exec();
             return;
         }
@@ -211,7 +192,7 @@ void OperatorWindow::get_tasks_list()
 
     // Запрос списка id задач.
     bool result = (ui->rbChoosen->isChecked()
-                  ? request_manager_ptr->send_get_tasklist(index_y_user_id_map[selection.at(0).row()])
+                       ? request_manager_ptr->send_get_tasklist(users_table_model->item(selection.at(0).row())->data().toInt())
                   : ( ui->rbOnlyOwn->isChecked()
                               ? request_manager_ptr->send_get_tasklist(own_id)
                               : request_manager_ptr->send_get_tasklist())
@@ -270,9 +251,6 @@ void OperatorWindow::get_tasks_list()
     // Очищаем таблицу от предыдущих строк.
     tasks_table_model->removeRows(1, tasks_table_model->rowCount()-1);
 
-    // Очищаем коллекцию связей id задачи и номера строки в таблице.
-    index_y_task_id_map.clear();
-
     int row_number;
 
     // Вывод данных в таблицу.
@@ -292,8 +270,6 @@ void OperatorWindow::get_tasks_list()
                                        ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name
                                        : ((iter->user_id == own_id) ? own_name : QString("Unknown")),
                                    Qt::DisplayRole);
-
-        index_y_task_id_map[row_number] = iter.key();
     }
 
     unlock_buttons();

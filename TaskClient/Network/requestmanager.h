@@ -82,6 +82,8 @@ public:
 
     bool send_set_taskuser(const int task_id, const int user_id);
 
+    bool send_set_deadline(const int task_id, const QString& deadline);
+
 private:
     const net_comm_unique net_communication_ptr;
 

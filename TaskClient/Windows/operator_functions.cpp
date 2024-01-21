@@ -96,7 +96,7 @@ void OperatorWindow::create_task()
     }
 
     // Должен быть выбран пользователь.
-    QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
+    const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
         message_window_ptr->set_message(QString("Choose a user for a new task"));
@@ -104,13 +104,7 @@ void OperatorWindow::create_task()
         return;
     }
 
-    if (!index_y_user_id_map.contains(selection.at(0).row())) {
-        message_window_ptr->set_message(QString("Unexpected users index error!"));
-        message_window_ptr->exec();
-        return;
-    }
-
-    const int user_id = index_y_user_id_map[selection.at(0).row()];
+    const int user_id = users_table_model->item(selection.at(0).row())->data().toInt();
 
     // Отправляем запрос на создание новой задачи.
     if ( !request_manager_ptr->send_add_task(user_id, deadline, task_name, description) ) {
@@ -147,8 +141,6 @@ void OperatorWindow::create_task()
     tasks_table_model->setData(tasks_table_model->index(row_number, 5), QString::number(user_id), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(row_number, 6), data_keeper_ptr->get_user_data(user_id)->login_type.user_name, Qt::DisplayRole);
 
-    index_y_task_id_map[row_number] = new_id;
-
     message_window_ptr->set_message(QString("Task %1\nhas been successfully created").arg(task_name));
     message_window_ptr->exec();
     unlock_buttons();
@@ -158,7 +150,7 @@ void OperatorWindow::create_task()
 void OperatorWindow::delete_task()
 {
     // Должна быть выбрана задача.
-    QModelIndexList selection = ui->tvTasks->selectionModel()->selectedRows();
+    const QModelIndexList selection = ui->tvTasks->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
         message_window_ptr->set_message(QString("Choose a task to delete"));
@@ -166,14 +158,7 @@ void OperatorWindow::delete_task()
         return;
     }
 
-    if (!index_y_task_id_map.contains(selection.at(0).row())) {
-        message_window_ptr->set_message(QString("Unexpected tasks index error!"));
-        message_window_ptr->exec();
-        return;
-    }
-
-    int str_position = selection.at(0).row();
-    const int task_id = index_y_task_id_map[str_position];
+    const int task_id = tasks_table_model->item(selection.at(0).row())->data().toInt();
     const QString task_to_del = data_keeper_ptr->get_task_data(task_id)->name;
 
     lock_buttons();
@@ -199,15 +184,6 @@ void OperatorWindow::delete_task()
     tasks_table_model->removeRows(selection.at(0).row(), 1);
     ui->tvTasks->clearSelection();
 
-    // Корректируем связи между номером строки и id.
-    for(; str_position < index_y_task_id_map.lastKey(); ++str_position ) {
-        index_y_task_id_map[str_position] = index_y_task_id_map[str_position + 1];
-    }
-
-    // Удаляем последнюю связь.
-    index_y_task_id_map.remove(index_y_task_id_map.lastKey());
-
-
     // Удаляем данные задачи.
     data_keeper_ptr->del_task_data(task_id);
 
@@ -220,7 +196,7 @@ void OperatorWindow::delete_task()
 void OperatorWindow::change_task_status()
 {
     // Должна быть выбрана задача.
-    QModelIndexList selection = ui->tvTasks->selectionModel()->selectedRows();
+    const QModelIndexList selection = ui->tvTasks->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
         message_window_ptr->set_message(QString("Choose a task to change status"));
@@ -228,13 +204,7 @@ void OperatorWindow::change_task_status()
         return;
     }
 
-    if (!index_y_task_id_map.contains(selection.at(0).row())) {
-        message_window_ptr->set_message(QString("Unexpected tasks index error!"));
-        message_window_ptr->exec();
-        return;
-    }
-
-    const int task_id = index_y_task_id_map[selection.at(0).row()];
+    const int task_id = tasks_table_model->item(selection.at(0).row())->data().toInt();
     const QString task_name = data_keeper_ptr->get_task_data(task_id)->name;
 
     // Нельзя изменять статус задачи, если не назначен исполнитель.
@@ -284,7 +254,7 @@ void OperatorWindow::change_task_status()
     // Обновляем содержимое ячейки в таблице.
     tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 1), collector_ptr->status_description(status), Qt::DisplayRole);
 
-    message_window_ptr->set_message(QString("Task status has been successfully changed\nto")
+    message_window_ptr->set_message(QString("Task status has been successfully changed\nto %1")
                                         .arg(collector_ptr->status_description(status)));
     message_window_ptr->exec();
     unlock_buttons();
@@ -293,11 +263,126 @@ void OperatorWindow::change_task_status()
 // Задать новую дату, до которой д/б выполнена задача.
 void OperatorWindow::set_task_deadline()
 {
+    // Должна быть выбрана задача.
+    const QModelIndexList selection = ui->tvTasks->selectionModel()->selectedRows();
 
+    if (selection.isEmpty()) {
+        message_window_ptr->set_message(QString("Choose a task to change deadline"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    const int task_id = tasks_table_model->item(selection.at(0).row())->data().toInt();
+    const QString task_name = data_keeper_ptr->get_task_data(task_id)->name;
+    const QString deadline = ui->leDeadLine->text();
+
+    if (deadline.isEmpty()) {
+        message_window_ptr->set_message(QString("Deadline field must be filled in"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    // Сравниваем старое значение deadline и новое.
+    if (deadline == data_keeper_ptr->get_task_data(task_id)->deadline) {
+        message_window_ptr->set_message(QString("Old and new deadline values are equal"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    lock_buttons();
+
+    // Отправляем запрос на изменение deadline задачи.
+    if ( !request_manager_ptr->send_set_deadline(task_id, deadline) ) {
+        message_window_ptr->set_message(request_manager_ptr->get_last_error());
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Контроль выполнения запроса.
+    if ( !handle_request(CommandType::Set)) {
+        message_window_ptr->set_message(QString("Unable to change deadline for\ntask %1!\n\n%2")
+                                            .arg(task_name, error_text));
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Запоминаем новый значение deadline задачи.
+    data_keeper_ptr->set_task_deadline(task_id, deadline);
+
+    // Обновляем содержимое ячейки в таблице.
+    tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 3), deadline, Qt::DisplayRole);
+
+    message_window_ptr->set_message(QString("Task deadline has been successfully changed\nto %1")
+                                        .arg(deadline));
+    message_window_ptr->exec();
+    unlock_buttons();
 }
 
 // Назначить другого пользователя на задачу.
 void OperatorWindow::appoint_user()
 {
+    // Должна быть выбрана задача.
+    const QModelIndexList task_selection = ui->tvTasks->selectionModel()->selectedRows();
 
+    if (task_selection.isEmpty()) {
+        message_window_ptr->set_message(QString("Choose a task to change user"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    const int task_id = tasks_table_model->item(task_selection.at(0).row())->data().toInt();
+    const QString task_name = data_keeper_ptr->get_task_data(task_id)->name;
+
+    // Должен быть выбран пользователь.
+    const QModelIndexList user_selection = ui->tvUsers->selectionModel()->selectedRows();
+
+    if (user_selection.isEmpty()) {
+        message_window_ptr->set_message(QString("Choose a user to appoint"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    const int user_id = users_table_model->item(user_selection.at(0).row())->data().toInt();
+
+    // Сравниваем нового и текущего исполнителя.
+    if (user_id == data_keeper_ptr->get_task_data(task_id)->user_id) {
+        message_window_ptr->set_message(QString("Old and new users are equal"));
+        message_window_ptr->exec();
+        return;
+    }
+
+    lock_buttons();
+
+    // Отправляем запрос на изменение исполнителя задачи.
+    if ( !request_manager_ptr->send_set_taskuser(task_id, user_id) ) {
+        message_window_ptr->set_message(request_manager_ptr->get_last_error());
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Контроль выполнения запроса.
+    if ( !handle_request(CommandType::Set)) {
+        message_window_ptr->set_message(QString("Unable to change user for\ntask %1!\n\n%2")
+                                            .arg(task_name, error_text));
+        message_window_ptr->exec();
+        unlock_buttons();
+        return;
+    }
+
+    // Запоминаем новый значение deadline задачи.
+    data_keeper_ptr->set_task_user(task_id, user_id);
+
+    // Обновляем содержимое ячейки в таблице.
+    tasks_table_model->setData(tasks_table_model->index(task_selection.at(0).row(), 5), QString::number(user_id), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(task_selection.at(0).row(), 6),
+                               data_keeper_ptr->get_user_data(user_id)->login_type.user_name,
+                               Qt::DisplayRole);
+
+    message_window_ptr->set_message(QString("Task user has been successfully changed\nto %1")
+                                        .arg(data_keeper_ptr->get_user_data(user_id)->login_type.user_name));
+    message_window_ptr->exec();
+    unlock_buttons();
 }

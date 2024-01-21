@@ -158,8 +158,6 @@ void AdminWindow::create_user()
     users_table_model->setData(users_table_model->index(row_number, 4), name, Qt::DisplayRole);
     users_table_model->setData(users_table_model->index(row_number, 5), patronymic, Qt::DisplayRole);
 
-    index_y_user_id_map[row_number] = new_id;
-
     message_window_ptr->set_message(QString("User %1 has been successfully created").arg(user_name));
     message_window_ptr->exec();
     unlock_buttons();
@@ -168,7 +166,7 @@ void AdminWindow::create_user()
 // Удалить выбранного пользователя.
 void AdminWindow::delete_user()
 {
-    QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
+    const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
         message_window_ptr->set_message(QString("Choose a user to delete"));
@@ -176,14 +174,7 @@ void AdminWindow::delete_user()
         return;
     }
 
-    if (!index_y_user_id_map.contains(selection.at(0).row())) {
-        message_window_ptr->set_message(QString("Unexpected index error!"));
-        message_window_ptr->exec();
-        return;
-    }
-
-    int str_position = selection.at(0).row();
-    const int user_id = index_y_user_id_map[str_position];
+    const int user_id = users_table_model->item(selection.at(0).row())->data().toInt();
 
     // Проверяем, нет ли попытки удалить себя.
     if (user_id == own_id) {
@@ -218,26 +209,18 @@ void AdminWindow::delete_user()
     users_table_model->removeRows(selection.at(0).row(), 1);
     ui->tvUsers->clearSelection();
 
-    // Корректируем связи между номером строки и id.
-    for(; str_position < index_y_user_id_map.lastKey(); ++str_position ) {
-        index_y_user_id_map[str_position] = index_y_user_id_map[str_position + 1];
-    }
-
-    // Удаляем последнюю связь.
-    index_y_user_id_map.remove(index_y_user_id_map.lastKey());
-
     // Удаляем данные пользователя.
     data_keeper_ptr->del_user_data(user_id);
 
     // Изменяем отображение в таблице.
-    for(auto iter = index_y_task_id_map.cbegin(); iter != index_y_task_id_map.cend(); ++iter) {
-        if (data_keeper_ptr->get_task_data(iter.value())->user_id != user_id) {
+    for(int i = 0; i < tasks_table_model->rowCount(); ++i) {
+        if (tasks_table_model->item(i)->data().toInt() != user_id) {
             continue;
         }
 
-        tasks_table_model->setData(tasks_table_model->index(iter.key(), 1), collector_ptr->status_description(1), Qt::DisplayRole);
-        tasks_table_model->setData(tasks_table_model->index(iter.key(), 5), QString("0"), Qt::DisplayRole);
-        tasks_table_model->setData(tasks_table_model->index(iter.key(), 6), QString("No user"), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(i, 1), collector_ptr->status_description(1), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(i, 5), QString("0"), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(i, 6), QString("No user"), Qt::DisplayRole);
     }
 
     // Всем задачам, на которые был назначен пользователь ставим статус "Not appointed" и user_id = 0.
@@ -251,7 +234,7 @@ void AdminWindow::delete_user()
 // Запрос на изменение данных пользователя.
 void AdminWindow::change_user_type()
 {
-    QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
+    const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
         message_window_ptr->set_message(QString("Choose a user to change user type"));
@@ -259,13 +242,7 @@ void AdminWindow::change_user_type()
         return;
     }
 
-    if (!index_y_user_id_map.contains(selection.at(0).row())) {
-        message_window_ptr->set_message(QString("Unexpected index error!"));
-        message_window_ptr->exec();
-        return;
-    }
-
-    const int user_id = index_y_user_id_map[selection.at(0).row()];
+    const int user_id = users_table_model->item(selection.at(0).row())->data().toInt();
 
     if (!data_keeper_ptr->users_containes(user_id)) {
         return;
@@ -321,7 +298,7 @@ void AdminWindow::change_user_type()
 // Запрос на изменение пароля.
 void AdminWindow::change_password()
 {
-    QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
+    const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
         message_window_ptr->set_message(QString("Choose a user to change password"));
@@ -329,13 +306,7 @@ void AdminWindow::change_password()
         return;
     }
 
-    if (!index_y_user_id_map.contains(selection.at(0).row())) {
-        message_window_ptr->set_message(QString("Unexpected index error!"));
-        message_window_ptr->exec();
-        return;
-    }
-
-    const int user_id = index_y_user_id_map[selection.at(0).row()];
+    const int user_id = users_table_model->item(selection.at(0).row())->data().toInt();
 
     if (!data_keeper_ptr->users_containes(user_id)) {
         return;

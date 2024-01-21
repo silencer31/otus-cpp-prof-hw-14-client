@@ -88,10 +88,6 @@ private: // data
     SimpleItemDelegate *users_table_delegate{nullptr};
     SimpleItemDelegate *tasks_table_delegate{nullptr};
 
-    QMap<int, int> index_y_task_id_map; // Для связи между строкой таблицы и id задачи.
-    QMap<int, int> index_y_user_id_map; // Для связи между строкой таблицы и id пользователя.
-
-
     std::string server_reply;
     QString error_text;
 };

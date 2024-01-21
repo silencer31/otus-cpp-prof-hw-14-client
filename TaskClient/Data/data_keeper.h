@@ -119,6 +119,11 @@ public:
         tasks_data[task_id].status = status;
     }
 
+    // Изменить deadline задачи.
+    void set_task_deadline(const int task_id, const QString& deadline) {
+        tasks_data[task_id].deadline = deadline;
+    }
+
     // Назначение пользователя на задачу.
     void set_task_user(const int task_id, const int user_id) {
         tasks_data[task_id].user_id = user_id;

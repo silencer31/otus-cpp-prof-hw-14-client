@@ -14,11 +14,7 @@ void AdminWindow::user_clicked(const QModelIndex& index)
         return;
     }
 
-    if (!index_y_user_id_map.contains(index.row())) {
-        return;
-    }
-
-    const int user_id = index_y_user_id_map[index.row()];
+    const int user_id = users_table_model->item(index.row())->data().toInt();
 
     ui->cbUserType->setCurrentIndex(data_keeper_ptr->get_user_data(user_id)->login_type.user_type - 1);
 
@@ -119,9 +115,6 @@ void AdminWindow::get_users_list()
     // Очищаем таблицу от предыдущих строк.
     users_table_model->removeRows(1, users_table_model->rowCount()-1);
 
-    // Удаляем все связи между строками таблицы и id пользователя.
-    index_y_user_id_map.clear();
-
     int row_number;
 
     // Вывод данных в таблицу.
@@ -135,8 +128,6 @@ void AdminWindow::get_users_list()
         users_table_model->setData(users_table_model->index(row_number, 3), iter->fullname.second, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 4), iter->fullname.first, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 5), iter->fullname.patronymic, Qt::DisplayRole);
-
-        index_y_user_id_map[row_number] = iter.key();
     }
 
     unlock_buttons();
@@ -228,9 +219,6 @@ void AdminWindow::get_tasks_list()
     // Очищаем таблицу от предыдущих строк.
     tasks_table_model->removeRows(1, tasks_table_model->rowCount()-1);
 
-    // Очищаем коллекцию связей id задачи и номера строки в таблице.
-    index_y_task_id_map.clear();
-
     // Вывод данных в таблицу.
     for(auto iter = data_keeper_ptr->tasks_data_cib(); iter != data_keeper_ptr->tasks_data_cie(); ++iter) {
         tasks_table_model->insertRow(tasks_table_model->rowCount());
@@ -247,9 +235,7 @@ void AdminWindow::get_tasks_list()
                                    data_keeper_ptr->users_containes(iter->user_id)
                                        ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name
                                        : ((iter->user_id == own_id) ? own_name : QString("Unknown")),
-                                   Qt::DisplayRole);
-
-        index_y_task_id_map[row_number] = iter.key();
+                                   Qt::DisplayRole);        
     }
 
     unlock_buttons();
