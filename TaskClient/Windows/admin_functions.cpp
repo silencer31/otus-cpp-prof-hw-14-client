@@ -182,7 +182,8 @@ void AdminWindow::delete_user()
         return;
     }
 
-    const int user_id = index_y_user_id_map[selection.at(0).row()];
+    int str_position = selection.at(0).row();
+    const int user_id = index_y_user_id_map[str_position];
 
     // Проверяем, нет ли попытки удалить себя.
     if (user_id == own_id) {
@@ -218,12 +219,12 @@ void AdminWindow::delete_user()
     ui->tvUsers->clearSelection();
 
     // Корректируем связи между номером строки и id.
-    for(auto iter = index_y_user_id_map.find(user_id) ; iter != (index_y_user_id_map.end() - 1); ++iter ) {
-        *iter = (iter + 1).value();
+    for(; str_position < index_y_user_id_map.lastKey(); ++str_position ) {
+        index_y_user_id_map[str_position] = index_y_user_id_map[str_position + 1];
     }
 
-    // Убираем связь между id и номером строки в таблице.
-    index_y_user_id_map.remove(user_id);
+    // Удаляем последнюю связь.
+    index_y_user_id_map.remove(index_y_user_id_map.lastKey());
 
     // Удаляем данные пользователя.
     data_keeper_ptr->del_user_data(user_id);

@@ -172,7 +172,8 @@ void OperatorWindow::delete_task()
         return;
     }
 
-    const int task_id = index_y_task_id_map[selection.at(0).row()];
+    int str_position = selection.at(0).row();
+    const int task_id = index_y_task_id_map[str_position];
     const QString task_to_del = data_keeper_ptr->get_task_data(task_id)->name;
 
     lock_buttons();
@@ -199,17 +200,16 @@ void OperatorWindow::delete_task()
     ui->tvTasks->clearSelection();
 
     // Корректируем связи между номером строки и id.
-    for(auto iter = index_y_task_id_map.find(task_id) ; iter != (index_y_task_id_map.end() - 1); ++iter ) {
-        *iter = (iter + 1).value();
+    for(; str_position < index_y_task_id_map.lastKey(); ++str_position ) {
+        index_y_task_id_map[str_position] = index_y_task_id_map[str_position + 1];
     }
 
-    // Удаляем связь строки и task_id.
-    index_y_task_id_map.remove(task_id);
+    // Удаляем последнюю связь.
+    index_y_task_id_map.remove(index_y_task_id_map.lastKey());
 
 
     // Удаляем данные задачи.
     data_keeper_ptr->del_task_data(task_id);
-
 
     message_window_ptr->set_message(QString("Task %1\nhas been successfully deleted").arg(task_to_del));
     message_window_ptr->exec();
