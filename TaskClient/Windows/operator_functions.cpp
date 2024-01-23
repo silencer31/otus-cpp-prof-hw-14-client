@@ -1,7 +1,7 @@
 #include "operatorwindow.h"
 #include "ui_operatorwindow.h"
 
-// Запрос возможных типов пользователей и статусов задач.
+// Запрос возможных типов пользователей.
 bool OperatorWindow::get_user_types()
 {
     // Проверяем, был ли ранее получен список типов пользователей.
@@ -99,12 +99,19 @@ void OperatorWindow::create_task()
     const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
+        ui->tabWidget->setCurrentIndex(1);
+
         message_window_ptr->set_message(QString("Choose a user for a new task"));
         message_window_ptr->exec();
         return;
     }
 
-    const int user_id = users_table_model->item(selection.at(0).row())->data().toInt();
+    bool ok = false;
+    const int user_id = users_table_model->item(selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || user_id <= 0) {
+        return;
+    }
 
     // Отправляем запрос на создание новой задачи.
     if ( !request_manager_ptr->send_add_task(user_id, deadline, task_name, description) ) {
@@ -158,7 +165,13 @@ void OperatorWindow::delete_task()
         return;
     }
 
-    const int task_id = tasks_table_model->item(selection.at(0).row())->data().toInt();
+    bool ok = false;
+    const int task_id = tasks_table_model->item(selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || task_id <= 0) {
+        return;
+    }
+
     const QString task_to_del = data_keeper_ptr->get_task_data(task_id)->name;
 
     lock_buttons();
@@ -204,7 +217,13 @@ void OperatorWindow::change_task_status()
         return;
     }
 
-    const int task_id = tasks_table_model->item(selection.at(0).row())->data().toInt();
+    bool ok = false;
+    const int task_id = tasks_table_model->item(selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || task_id <= 0) {
+        return;
+    }
+
     const QString task_name = data_keeper_ptr->get_task_data(task_id)->name;
 
     // Нельзя изменять статус задачи, если не назначен исполнитель.
@@ -246,13 +265,17 @@ void OperatorWindow::change_task_status()
     // Запоминаем новый статус задачи.
     data_keeper_ptr->set_task_status(task_id, status);
 
-    // Если новый статус "Not appointed", присваиваем у задачи user_id = 0.
+    // Обновляем содержимое ячейки в таблице.
+    tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 1),
+                               collector_ptr->status_description(status), Qt::DisplayRole);
+
+    // Если новый статус "not appointed", присваиваем у задачи user_id = 0.
     if ( status == 1 ) {
         data_keeper_ptr->reset_task_user(task_id);
-    }
 
-    // Обновляем содержимое ячейки в таблице.
-    tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 1), collector_ptr->status_description(status), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 5), QString("0"), Qt::DisplayRole);
+        tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 6), QString("Unknown"), Qt::DisplayRole);
+    }
 
     message_window_ptr->set_message(QString("Task status has been successfully changed\nto %1")
                                         .arg(collector_ptr->status_description(status)));
@@ -272,7 +295,13 @@ void OperatorWindow::set_task_deadline()
         return;
     }
 
-    const int task_id = tasks_table_model->item(selection.at(0).row())->data().toInt();
+    bool ok = false;
+    const int task_id = tasks_table_model->item(selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || task_id <= 0) {
+        return;
+    }
+
     const QString task_name = data_keeper_ptr->get_task_data(task_id)->name;
     const QString deadline = ui->leDeadLine->text();
 
@@ -308,7 +337,7 @@ void OperatorWindow::set_task_deadline()
         return;
     }
 
-    // Запоминаем новый значение deadline задачи.
+    // Запоминаем новое значение deadline задачи.
     data_keeper_ptr->set_task_deadline(task_id, deadline);
 
     // Обновляем содержимое ячейки в таблице.
@@ -332,19 +361,31 @@ void OperatorWindow::appoint_user()
         return;
     }
 
-    const int task_id = tasks_table_model->item(task_selection.at(0).row())->data().toInt();
+    bool ok = false;
+    const int task_id = tasks_table_model->item(task_selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || task_id <= 0) {
+        return;
+    }
+
     const QString task_name = data_keeper_ptr->get_task_data(task_id)->name;
 
     // Должен быть выбран пользователь.
     const QModelIndexList user_selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (user_selection.isEmpty()) {
+        ui->tabWidget->setCurrentIndex(1);
         message_window_ptr->set_message(QString("Choose a user to appoint"));
         message_window_ptr->exec();
         return;
     }
 
-    const int user_id = users_table_model->item(user_selection.at(0).row())->data().toInt();
+    ok = false;
+    const int user_id = users_table_model->item(user_selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || user_id <= 0) {
+        return;
+    }
 
     // Сравниваем нового и текущего исполнителя.
     if (user_id == data_keeper_ptr->get_task_data(task_id)->user_id) {
@@ -372,8 +413,20 @@ void OperatorWindow::appoint_user()
         return;
     }
 
-    // Запоминаем новый значение deadline задачи.
+    // Запоминаем новое значение user_id исполнителя задачи.
     data_keeper_ptr->set_task_user(task_id, user_id);
+
+    // Проверяем, был ли у задачи статус "not appointed".
+    if (data_keeper_ptr->get_task_data(task_id)->status == 1) {
+        // Устанавливаем статус задачи "appointed".
+        data_keeper_ptr->set_task_status(task_id, 2);
+
+        // Обновляем содержимое ячейки в таблице.
+        tasks_table_model->setData(tasks_table_model->index(task_selection.at(0).row(), 1),
+                                   collector_ptr->status_description(2), Qt::DisplayRole);
+
+        ui->cbTaskStatus->setCurrentIndex(1);
+    }
 
     // Обновляем содержимое ячейки в таблице.
     tasks_table_model->setData(tasks_table_model->index(task_selection.at(0).row(), 5), QString::number(user_id), Qt::DisplayRole);

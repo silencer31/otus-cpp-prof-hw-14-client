@@ -259,7 +259,7 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="tabUsers">
      <attribute name="title">
       <string>Users</string>
      </attribute>
@@ -850,7 +850,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_2">
+    <widget class="QWidget" name="tabTasks">
      <attribute name="title">
       <string>Tasks</string>
      </attribute>
@@ -943,7 +943,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_3">
+    <widget class="QWidget" name="tabSpecial">
      <attribute name="title">
       <string>Special</string>
      </attribute>

@@ -236,7 +236,7 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="tabTasks">
      <attribute name="title">
       <string>Tasks</string>
      </attribute>
@@ -805,7 +805,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Appoint User</string>
+        <string>Appoint User  ---&gt;</string>
        </property>
       </widget>
      </widget>
@@ -848,7 +848,7 @@
      <widget class="QPushButton" name="pbClear">
       <property name="geometry">
        <rect>
-        <x>1290</x>
+        <x>1300</x>
         <y>570</y>
         <width>200</width>
         <height>40</height>
@@ -885,7 +885,7 @@
       <property name="geometry">
        <rect>
         <x>1300</x>
-        <y>470</y>
+        <y>660</y>
         <width>200</width>
         <height>28</height>
        </rect>
@@ -921,7 +921,7 @@
       <property name="geometry">
        <rect>
         <x>1180</x>
-        <y>470</y>
+        <y>660</y>
         <width>100</width>
         <height>28</height>
        </rect>
@@ -1086,7 +1086,7 @@
       <property name="geometry">
        <rect>
         <x>970</x>
-        <y>470</y>
+        <y>660</y>
         <width>80</width>
         <height>28</height>
        </rect>
@@ -1122,7 +1122,7 @@
       <property name="geometry">
        <rect>
         <x>1050</x>
-        <y>470</y>
+        <y>660</y>
         <width>100</width>
         <height>28</height>
        </rect>
@@ -1155,7 +1155,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_2">
+    <widget class="QWidget" name="tabUsers">
      <attribute name="title">
       <string>Users</string>
      </attribute>

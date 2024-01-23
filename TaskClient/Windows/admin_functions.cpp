@@ -174,7 +174,12 @@ void AdminWindow::delete_user()
         return;
     }
 
-    const int user_id = users_table_model->item(selection.at(0).row())->data().toInt();
+    bool ok = false;
+    const int user_id = users_table_model->item(selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || user_id <= 0) {
+        return;
+    }
 
     // Проверяем, нет ли попытки удалить себя.
     if (user_id == own_id) {
@@ -242,7 +247,12 @@ void AdminWindow::change_user_type()
         return;
     }
 
-    const int user_id = users_table_model->item(selection.at(0).row())->data().toInt();
+    bool ok = false;
+    const int user_id = users_table_model->item(selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || user_id <= 0) {
+        return;
+    }
 
     if (!data_keeper_ptr->users_containes(user_id)) {
         return;
@@ -306,7 +316,12 @@ void AdminWindow::change_password()
         return;
     }
 
-    const int user_id = users_table_model->item(selection.at(0).row())->data().toInt();
+    bool ok = false;
+    const int user_id = users_table_model->item(selection.at(0).row())->data(Qt::DisplayRole).toInt(&ok);
+
+    if (!ok || user_id <= 0) {
+        return;
+    }
 
     if (!data_keeper_ptr->users_containes(user_id)) {
         return;

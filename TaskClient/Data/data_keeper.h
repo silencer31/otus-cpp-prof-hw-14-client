@@ -34,7 +34,7 @@ public:
         return users_data.isEmpty();
     }
 
-    // Узнать, пуста ли коллекция с пользователями.
+    // Узнать, пуста ли коллекция с задачами.
     bool tasks_is_empty() {
         return tasks_data.isEmpty();
     }
@@ -45,7 +45,7 @@ public:
         users_data[id] = user;
     }
 
-    // Добавление данных задачи
+    // Добавление данных задачи.
     void add_task(const int id, const TaskData& task) {
         tasks_data[id] = task;
     }

@@ -15,7 +15,16 @@ void OperatorWindow::user_clicked(const QModelIndex& index)
         return;
     }
 
-    const int user_id = users_table_model->item(index.row())->data().toInt();
+    bool ok = false;
+    const int user_id = users_table_model->item(index.row(), 0)->data(Qt::DisplayRole).toInt(&ok);
+
+    // Проверка определённого значения.
+    if ( !ok || user_id <= 0) {
+        message_window_ptr->set_message(QString("Unexpected id error!\nid: %1").arg(QString::number(user_id)));
+        message_window_ptr->exec();
+        ui->tvUsers->clearSelection();
+        return;
+    }
 
     ui->leUserId->setText( QString::number(user_id) );
     ui->leUserName->setText( data_keeper_ptr->get_user_data(user_id)->login_type.user_name );
@@ -36,7 +45,16 @@ void OperatorWindow::task_clicked(const QModelIndex& index)
         return;
     }
 
-    const int task_id = tasks_table_model->item(index.row())->data().toInt();
+    bool ok = false;
+    const int task_id = tasks_table_model->item(index.row(), 0)->data(Qt::DisplayRole).toInt(&ok);
+
+    // Проверка определённого значения.
+    if ( !ok || task_id <= 0) {
+        message_window_ptr->set_message(QString("Unexpected id error!\nid: %1").arg(QString::number(task_id)));
+        message_window_ptr->exec();
+        ui->tvTasks->clearSelection();
+        return;
+    }
 
     ui->leTaskName->setText( data_keeper_ptr->get_task_data(task_id)->name );
     ui->leDeadLine->setText( data_keeper_ptr->get_task_data(task_id)->deadline );
@@ -149,6 +167,24 @@ void OperatorWindow::get_users_list()
         users_table_model->setData(users_table_model->index(row_number, 3), iter->fullname.second, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 4), iter->fullname.first, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 5), iter->fullname.patronymic, Qt::DisplayRole);
+    }
+
+    // Если ранее был получен список задач, обновляем столбец с логинами в таблице с задачами.
+    if ( !data_keeper_ptr->tasks_is_empty() ) {
+        bool ok = false;
+        int user_id = 0;
+
+        for(int i = 1; i < tasks_table_model->rowCount(); ++i) {
+            user_id = tasks_table_model->item(i, 5)->data(Qt::DisplayRole).toInt(&ok);
+
+            if (ok && user_id > 0) {
+                tasks_table_model->setData(tasks_table_model->index(i, 6),
+                                            data_keeper_ptr->users_containes(user_id)
+                                               ? (data_keeper_ptr->get_user_data(user_id))->login_type.user_name
+                                               : ((user_id == own_id) ? own_name : QString("Unknown")),
+                                            Qt::DisplayRole);
+            }
+        }
     }
 
     unlock_buttons();

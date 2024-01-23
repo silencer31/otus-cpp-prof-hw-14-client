@@ -14,7 +14,16 @@ void AdminWindow::user_clicked(const QModelIndex& index)
         return;
     }
 
-    const int user_id = users_table_model->item(index.row())->data().toInt();
+    bool ok = false;
+    const int user_id = users_table_model->item(index.row(), 0)->data(Qt::DisplayRole).toInt(&ok);
+
+    // Проверка определённого значения.
+    if ( !ok || user_id <= 0) {
+        message_window_ptr->set_message(QString("Unexpected id error!\nid: %1").arg(QString::number(user_id)));
+        message_window_ptr->exec();
+        ui->tvUsers->clearSelection();
+        return;
+    }
 
     ui->cbUserType->setCurrentIndex(data_keeper_ptr->get_user_data(user_id)->login_type.user_type - 1);
 
