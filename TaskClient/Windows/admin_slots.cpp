@@ -34,9 +34,30 @@ void AdminWindow::user_clicked(const QModelIndex& index)
 }
 
 // Реакция на клик по строке в таблице с задачами.
-void AdminWindow::task_clicked(const QModelIndex&)
+void AdminWindow::task_clicked(const QModelIndex& index)
 {
+    if (index.row() == 0) {
+        ui->leDescription->clear();
+        ui->tvTasks->clearSelection();
+        return;
+    }
 
+    if (data_keeper_ptr->tasks_is_empty()) {
+        return;
+    }
+
+    bool ok = false;
+    const int task_id = tasks_table_model->item(index.row(), 0)->data(Qt::DisplayRole).toInt(&ok);
+
+    // Проверка определённого значения.
+    if ( !ok || task_id <= 0) {
+        message_window_ptr->set_message(QString("Unexpected id error!\nid: %1").arg(QString::number(task_id)));
+        message_window_ptr->exec();
+        ui->tvTasks->clearSelection();
+        return;
+    }
+
+    ui->leDescription->setText( data_keeper_ptr->get_task_data(task_id)->description );
 }
 
 // Запрос списка пользователей.

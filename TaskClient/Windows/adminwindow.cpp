@@ -47,7 +47,7 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     tasks_table_model->insertColumns(0, 7);
     tasks_table_model->setData(tasks_table_model->index(0, 0), QString("Task id"), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(0, 1), QString("Status"), Qt::DisplayRole);
-    tasks_table_model->setData(tasks_table_model->index(0, 2), QString("Name"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 2), QString("Task name"), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(0, 3), QString("Deadline"), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(0, 4), QString("Description"), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(0, 5), QString("User id"), Qt::DisplayRole);
@@ -90,12 +90,17 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvTasks->setColumnWidth(5, 100); // User id
     ui->tvTasks->setColumnWidth(6, 200); // Login
     ui->tvTasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tvTasks->setSelectionMode(QAbstractItemView::SingleSelection);
     //ui->tvTasks->setSelectionMode(QAbstractItemView::NoSelection);
     ui->tvTasks->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Нажатие по строке в таблице с пользователями.
     connect(ui->tvUsers, SIGNAL(clicked(const QModelIndex &)),
             this, SLOT(user_clicked(const QModelIndex &)));
+
+    // Нажатие по строке в таблице с пользователями.
+    connect(ui->tvTasks, SIGNAL(clicked(const QModelIndex &)),
+            this, SLOT(task_clicked(const QModelIndex &)));
 
     // Нажатие на кнопку.
     connect(ui->pbGetUsers, SIGNAL(clicked(bool)), this, SLOT(get_users_list()) );

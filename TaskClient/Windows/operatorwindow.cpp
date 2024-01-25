@@ -47,7 +47,7 @@ OperatorWindow::OperatorWindow(const req_mngr_shared rm_ptr, const collector_sha
     tasks_table_model->insertColumns(0, 7);
     tasks_table_model->setData(tasks_table_model->index(0, 0), QString("Task id"), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(0, 1), QString("Status"), Qt::DisplayRole);
-    tasks_table_model->setData(tasks_table_model->index(0, 2), QString("Name"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 2), QString("Task name"), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(0, 3), QString("Deadline"), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(0, 4), QString("Description"), Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(0, 5), QString("User id"), Qt::DisplayRole);

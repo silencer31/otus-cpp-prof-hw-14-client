@@ -936,6 +936,15 @@
 #tvTasks::item {
   border : 0px;
   padding-left: 10px;
+}
+
+#tvTasks::item:selected {
+	color: black;
+	background-color: #FFF3BF;
+}
+
+#tvTasks::branch:selected { 
+	background: #FFF3BF; 
 }</string>
       </property>
      </widget>
