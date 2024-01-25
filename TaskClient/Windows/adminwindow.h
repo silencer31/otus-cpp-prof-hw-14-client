@@ -58,7 +58,10 @@ private: // methods
 
 private slots:
     // Реакция на клик по строке в таблице с пользователями.
-    void user_clicked(const QModelIndex&);
+    void user_clicked(const QModelIndex& index);
+
+    // Реакция на клик по строке в таблице с задачами.
+    void task_clicked(const QModelIndex&);
 
     // Запрос списка пользователей.
     void get_users_list();

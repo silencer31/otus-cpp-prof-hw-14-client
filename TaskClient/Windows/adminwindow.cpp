@@ -80,7 +80,6 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvTasks->setItemDelegate(tasks_table_delegate); // Устанавливаем делегат в представление.
     ui->tvTasks->horizontalHeader()->hide();
     ui->tvTasks->verticalHeader()->hide();
-    //ui->tvTasks->setSelectionMode(QAbstractItemView::NoSelection);
     ui->tvTasks->setShowGrid(true);
     ui->tvTasks->setRowHeight(0, ROW_HEIGHT);
     ui->tvTasks->setColumnWidth(0, 100); // Task id
@@ -91,6 +90,8 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->tvTasks->setColumnWidth(5, 100); // User id
     ui->tvTasks->setColumnWidth(6, 200); // Login
     ui->tvTasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    //ui->tvTasks->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->tvTasks->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Нажатие по строке в таблице с пользователями.
     connect(ui->tvUsers, SIGNAL(clicked(const QModelIndex &)),

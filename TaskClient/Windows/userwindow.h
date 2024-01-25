@@ -35,13 +35,17 @@ private: // methods
     bool handle_request(CommandType comm_type);
 
 private slots:
+    // Реакция на клик по строке в таблице с задачами.
+    void task_clicked(const QModelIndex&);
+
+    // Запрос списка задач.
     void get_tasks_list();
 
-    void take_task();
+    // Создать новую или изменить данные выбранной задачи.
+    void add_or_edit_task();
 
-    void set_task_status();
-
-    void create_task();
+    // Очистить поля ввода.
+    void clear_fields();
 
 private: // data
     Ui::UserWindow *ui;

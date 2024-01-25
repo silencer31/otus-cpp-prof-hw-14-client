@@ -1,22 +1,27 @@
 #include "userwindow.h"
 #include "ui_userwindow.h"
 
+// Реакция на клик по строке в таблице с задачами.
+void UserWindow::task_clicked(const QModelIndex& index)
+{
+
+}
+
+// Запрос списка задач.
 void UserWindow::get_tasks_list()
 {
 
 }
 
-void UserWindow::take_task()
+// Создать новую или изменить данные выбранной задачи.
+void UserWindow::add_or_edit_task()
 {
 
 }
 
-void UserWindow::set_task_status()
+// Очистить поля ввода.
+void UserWindow::clear_fields()
 {
 
 }
 
-void UserWindow::create_task()
-{
-
-}

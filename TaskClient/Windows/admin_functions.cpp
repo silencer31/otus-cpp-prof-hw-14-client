@@ -219,7 +219,7 @@ void AdminWindow::delete_user()
 
     // Изменяем отображение в таблице.
     for(int i = 0; i < tasks_table_model->rowCount(); ++i) {
-        if (tasks_table_model->item(i)->data().toInt() != user_id) {
+        if (tasks_table_model->item(i, 5)->data(Qt::DisplayRole).toInt(&ok) != user_id) {
             continue;
         }
 

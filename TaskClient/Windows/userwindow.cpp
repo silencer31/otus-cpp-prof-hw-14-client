@@ -28,31 +28,41 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
 
     // Настройка модели с данными о задачах.
     tasks_table_model->insertRow(0);
-    tasks_table_model->insertColumns(0,2);
-    tasks_table_model->setData(tasks_table_model->index(0, 0), QString("  Номер"), Qt::DisplayRole);
-    tasks_table_model->setData(tasks_table_model->index(0, 1), QString("Есть на АРМ"), Qt::DisplayRole);
-    tasks_table_model->itemFromIndex(tasks_table_model->index(0, 0))->setFont(font);
-    tasks_table_model->itemFromIndex(tasks_table_model->index(0, 0))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    tasks_table_model->itemFromIndex(tasks_table_model->index(0, 1))->setFont(font);
-    tasks_table_model->itemFromIndex(tasks_table_model->index(0, 1))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    tasks_table_model->insertColumns(0, 7);
+    tasks_table_model->setData(tasks_table_model->index(0, 0), QString("Task id"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 1), QString("Status"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 2), QString("Name"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 3), QString("Deadline"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 4), QString("Description"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 5), QString("User id"), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(0, 6), QString("Login"), Qt::DisplayRole);
+    for(int i = 0; i < 7; ++i) {
+        tasks_table_model->itemFromIndex(tasks_table_model->index(0, i))->setFont(font);
+        tasks_table_model->itemFromIndex(tasks_table_model->index(0, i))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    }
 
     // Настройка отображения таблицы с данными о задачах.
     ui->tvTasks->setModel(tasks_table_model);
     ui->tvTasks->setItemDelegate(tasks_table_delegate); // Устанавливаем делегат в представление.
     ui->tvTasks->horizontalHeader()->hide();
     ui->tvTasks->verticalHeader()->hide();
-    ui->tvTasks->setSelectionMode(QAbstractItemView::NoSelection);
     ui->tvTasks->setShowGrid(true);
     ui->tvTasks->setRowHeight(0, ROW_HEIGHT);
-    ui->tvTasks->setColumnWidth(0, 230);
-    ui->tvTasks->setColumnWidth(1, 120);
+    ui->tvTasks->setColumnWidth(0, 100); // Task id
+    ui->tvTasks->setColumnWidth(1, 150); // Status
+    ui->tvTasks->setColumnWidth(2, 250); // Name
+    ui->tvTasks->setColumnWidth(3, 150); // Deadline
+    ui->tvTasks->setColumnWidth(4, 500); // Description
+    ui->tvTasks->setColumnWidth(5, 100); // User id
+    ui->tvTasks->setColumnWidth(6, 200); // Login
     ui->tvTasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tvTasks->setSelectionMode(QAbstractItemView::SingleSelection);
+    //ui->tvUsers->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->tvTasks->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    connect(ui->pbTakeTask, SIGNAL(clicked(bool)), this, SLOT(take_task()) );
-    connect(ui->pbSetStatus, SIGNAL(clicked(bool)), this, SLOT(set_task_status()) );
     connect(ui->pbGetTasks, SIGNAL(clicked(bool)), this, SLOT(get_tasks_list()) );
-    connect(ui->pbNewTask, SIGNAL(clicked(bool)), this, SLOT(create_task()) );
-
+    connect(ui->pbApply, SIGNAL(clicked(bool)), this, SLOT(add_or_edit_task()) );
+    connect(ui->pbClear, SIGNAL(clicked(bool)), this, SLOT(clear_fields()) );
     connect(ui->pbExit, SIGNAL(clicked(bool)), this, SLOT(close()) );
 
     ui->leOwnId->setText(QString::number(own_id));
@@ -61,21 +71,17 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
 
 void UserWindow::lock_buttons()
 {
-    ui->pbTakeTask->setEnabled(false);
-    ui->pbSetStatus->setEnabled(false);
     ui->pbGetTasks->setEnabled(false);
-    ui->pbNewTask->setEnabled(false);
-
+    ui->pbApply->setEnabled(false);
+    ui->pbClear->setEnabled(false);
     ui->pbExit->setEnabled(false);
 }
 
 void UserWindow::unlock_buttons()
 {
-    ui->pbTakeTask->setEnabled(true);
-    ui->pbSetStatus->setEnabled(true);
     ui->pbGetTasks->setEnabled(true);
-    ui->pbNewTask->setEnabled(true);
-
+    ui->pbApply->setEnabled(true);
+    ui->pbClear->setEnabled(true);
     ui->pbExit->setEnabled(true);
 }
 

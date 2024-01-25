@@ -33,6 +33,12 @@ void AdminWindow::user_clicked(const QModelIndex& index)
     ui->lePatronymic->setText( data_keeper_ptr->get_user_data(user_id)->fullname.patronymic );
 }
 
+// Реакция на клик по строке в таблице с задачами.
+void AdminWindow::task_clicked(const QModelIndex&)
+{
+
+}
+
 // Запрос списка пользователей.
 void AdminWindow::get_users_list()
 {
@@ -137,6 +143,30 @@ void AdminWindow::get_users_list()
         users_table_model->setData(users_table_model->index(row_number, 3), iter->fullname.second, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 4), iter->fullname.first, Qt::DisplayRole);
         users_table_model->setData(users_table_model->index(row_number, 5), iter->fullname.patronymic, Qt::DisplayRole);
+    }
+
+    // Проверяем, был ли уже получен список с задачами.
+    if ( data_keeper_ptr->tasks_is_empty() ) {
+        unlock_buttons();
+        return;
+    }
+
+    bool ok = false;
+    int user_id = 0;
+
+    // Если ранее был получен список задач, обновляем столбец с логинами в таблице с задачами.
+    for(int i = 1; i < tasks_table_model->rowCount(); ++i) {
+        user_id = tasks_table_model->item(i, 5)->data(Qt::DisplayRole).toInt(&ok);
+
+        if (!ok || user_id <= 0) {
+            continue;
+        }
+
+        tasks_table_model->setData(tasks_table_model->index(i, 6),
+                                data_keeper_ptr->users_containes(user_id)
+                                ? (data_keeper_ptr->get_user_data(user_id))->login_type.user_name
+                                : ((user_id == own_id) ? own_name : QString("Unknown")),
+                                Qt::DisplayRole);
     }
 
     unlock_buttons();
