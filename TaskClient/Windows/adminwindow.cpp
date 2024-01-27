@@ -137,33 +137,36 @@ void AdminWindow::unlock_buttons()
     ui->pbExit->setEnabled(true);
 }
 
+// Показать сообщение пользователю.
+void AdminWindow::show_message(const QString& message)
+{
+    message_window_ptr->set_message(message);
+    message_window_ptr->exec();
+}
+
 void AdminWindow::check_server()
 {
     // Есть ли связь с сервером.
     if (!request_manager_ptr->connected_to_server()) {
-        message_window_ptr->set_message(QString("No connection with server!"));
-        message_window_ptr->exec();
+        show_message(QString("No connection with server!"));
         return;
     }
 
     // Отправляем тестовый запрос, чтобы узнать, готов ли сервер обрабатывать запросы.
     if (!request_manager_ptr->send_test_request()) {
-        message_window_ptr->set_message(QString("Unable to send test request!\n%1")
-                                        .arg(request_manager_ptr->get_last_error()));
-        message_window_ptr->exec();
+        show_message(QString("Unable to send test request!\n%1").arg(request_manager_ptr->get_last_error()));
         return;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Test)) {
-        message_window_ptr->set_message(QString("Server is unable to handle requests!\n%1").arg(error_text));
-        message_window_ptr->exec();
+        show_message(QString("Server is unable to handle requests!\n%1").arg(error_text));
     }
 
-    message_window_ptr->set_message(QString("Server shutdown completed.\nFurther communication impossible"));
-    message_window_ptr->exec();
+    show_message(QString("Server is ready to receive requests"));
 }
 
+// Обработка реакции сервера на сетевой запрос.
 bool AdminWindow::handle_request(CommandType comm_type)
 {
     // Пытаемся получить ответ от сервера.

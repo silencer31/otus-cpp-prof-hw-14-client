@@ -19,6 +19,7 @@ public:
     DataKeeper() = default;
     ~DataKeeper() = default;
 
+    /// Очистка коллекций.
     // Очистка всех данных о пользователях.
     void users_clear() {
         users_data.clear();
@@ -29,17 +30,7 @@ public:
         tasks_data.clear();
     }
 
-    // Узнать, пуста ли коллекция с пользователями.
-    bool users_is_empty() {
-        return users_data.isEmpty();
-    }
-
-    // Узнать, пуста ли коллекция с задачами.
-    bool tasks_is_empty() {
-        return tasks_data.isEmpty();
-    }
-
-
+    /// Добавление данных в коллекции.
     // Добавление данных пользователя.
     void add_user(const int id, const UserData& user) {
         users_data[id] = user;
@@ -50,16 +41,39 @@ public:
         tasks_data[id] = task;
     }
 
-    // Узнать, есть ли такой id в коллекции c данными пользователей.
+    /// Получение данных.
+    // Узнать, пуста ли коллекция с пользователями.
+    bool users_is_empty() {
+        return users_data.isEmpty();
+    }
+
+    // Узнать, пуста ли коллекция с задачами.
+    bool tasks_is_empty() {
+        return tasks_data.isEmpty();
+    }
+
+    // Узнать, есть ли пользователь с таким id в коллекции c данными пользователей.
     bool users_containes(const int id) {
         return users_data.contains(id);
     }
 
-    // Узнать, есть ли в коллекции c данными задач.
+    // Узнать, есть ли задача с таким id в коллекции c данными задач.
     bool tasks_containes(const int id) {
         return tasks_data.contains(id);
     }
 
+    // Узнать, есть ли уже такой логин среди полученных.
+    bool user_name_received(const QString& login);
+
+    // Узнать, есть ли уже такая задача среди полученных по имени задачи.
+    bool task_name_received(const QString& task_name);
+
+    // Получить id пользователя - исполнителя задачи.
+    int get_task_user(const int task_id) {
+        return (tasks_data.contains(task_id) ? tasks_data[task_id].user_id : -1);
+    }
+
+    /// Удаление данных из коллекций.
     // Удалить данные пользователя по его id.
     void del_user_data(const int id) {
         users_data.remove(id);
@@ -70,6 +84,7 @@ public:
         tasks_data.remove(id);
     }
 
+    /// Итераторы на коллекцию с данными пользователей.
     // Получить итератор на начало коллекции с данными пользователей.
     QMap<int, UserData>::const_iterator users_data_cib() {
         return users_data.constBegin();
@@ -85,7 +100,7 @@ public:
         return users_data.constFind(id);
     }
 
-
+    /// Итераторы на коллекцию с данными задач.
     // Получить итератор на начало коллекции с данными задач.
     QMap<int, TaskData>::const_iterator tasks_data_cib() {
         return tasks_data.constBegin();
@@ -101,14 +116,7 @@ public:
         return tasks_data.constFind(id);
     }
 
-    // Узнать, есть ли уже такой логин среди полученных.
-    bool user_name_received(const QString& login);
-
-    // Узнать, есть ли уже такая задача среди полученных.
-    bool task_name_received(const QString& task_name);
-
     /// Корректировка полученных данных.
-
     // Изменить тип пользователя.
     void set_user_type(const int user_id, const int user_type) {
         users_data[user_id].login_type.user_type = user_type;

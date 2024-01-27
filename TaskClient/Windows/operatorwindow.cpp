@@ -134,6 +134,14 @@ void OperatorWindow::unlock_buttons()
     ui->pbExit->setEnabled(true);
 }
 
+// Показать сообщение пользователю.
+void OperatorWindow::show_message(const QString& message)
+{
+    message_window_ptr->set_message(message);
+    message_window_ptr->exec();
+}
+
+// Обработка реакции сервера на сетевой запрос.
 bool OperatorWindow::handle_request(CommandType comm_type)
 {
     // Пытаемся получить ответ от сервера.

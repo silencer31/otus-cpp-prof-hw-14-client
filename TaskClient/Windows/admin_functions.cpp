@@ -11,23 +11,20 @@ bool AdminWindow::get_user_types()
 
     // Запрос списка типа пользователей.
     if (!request_manager_ptr->send_get_typelist()) {
-        message_window_ptr->set_message(QString("Unable to send get typelist request!\n\n%1")
+        show_message(QString("Unable to send get typelist request!\n\n%1")
                                             .arg(request_manager_ptr->get_last_error()));
-        message_window_ptr->exec();
         return false;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Get)) {
-        message_window_ptr->set_message(QString("Unable to get user types!\n\n%1").arg(error_text));
-        message_window_ptr->exec();
+        show_message(QString("Unable to get user types!\n\n%1").arg(error_text));
         return false;
     }
 
     // Проверяем, что получено от сервера.
     if (!collector_ptr->user_types_received()) {
-        message_window_ptr->set_message(QString("Получена пустая коллекция типов пользователей"));
-        message_window_ptr->exec();
+        show_message(QString("Получена пустая коллекция типов пользователей"));
         return false;
     }
 
@@ -52,16 +49,14 @@ bool AdminWindow::get_task_statuses()
 
     // Запрос списка статусов задач.
     if (!request_manager_ptr->send_get_statuslist()) {
-        message_window_ptr->set_message(QString("Unable to send get statuslist request!\n\n%1")
+        show_message(QString("Unable to send get statuslist request!\n\n%1")
                                             .arg(request_manager_ptr->get_last_error()));
-        message_window_ptr->exec();
         return false;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Get)) {
-        message_window_ptr->set_message(QString("Unable to get task statuses!\n\n%1").arg(error_text));
-        message_window_ptr->exec();
+        show_message(QString("Unable to get task statuses!\n\n%1").arg(error_text));
         return false;
     }
 
@@ -70,8 +65,8 @@ bool AdminWindow::get_task_statuses()
         return true;
     }
 
-    message_window_ptr->set_message(QString("Получена пустая коллекция статусов задач"));
-    message_window_ptr->exec();
+    show_message(QString("Получена пустая коллекция статусов задач"));
+
     return false;
 }
 
@@ -85,15 +80,13 @@ void AdminWindow::create_user()
 
     // Проверка, заполнены ли поля.
     if (user_name.isEmpty() || surename.isEmpty() || name.isEmpty() || patronymic.isEmpty()) {
-        message_window_ptr->set_message(QString("All the fields have to be filled in!"));
-        message_window_ptr->exec();
+        show_message(QString("All the fields have to be filled in!"));
         return;
     }
 
     // Проверка, используется ли уже такой логин.
     if (data_keeper_ptr->user_name_received(user_name)) {
-        message_window_ptr->set_message(QString("Login %1 is already in use!\nPlease enter another value").arg(user_name));
-        message_window_ptr->exec();
+        show_message(QString("Login %1 is already in use!\nPlease enter another value").arg(user_name));
         return;
     }
 
@@ -108,15 +101,13 @@ void AdminWindow::create_user()
 
     // Не должно быть пустого значения пароля.
     if (pass_value_1.isEmpty() || pass_value_2.isEmpty()) {
-        message_window_ptr->set_message(QString("Both password fields have to be filled in!"));
-        message_window_ptr->exec();
+        show_message(QString("Both password fields have to be filled in!"));
         return;
     }
 
     // Оба значения должны совпадать.
     if (pass_value_1 != pass_value_2) {
-        message_window_ptr->set_message(QString("Password values do not match!"));
-        message_window_ptr->exec();
+        show_message(QString("Password values do not match!"));
         return;
     }
 
@@ -127,16 +118,14 @@ void AdminWindow::create_user()
     // Отправляем запрос на создание нового пользователя.
     if ( !request_manager_ptr->send_add_user(user_name, user_type, pass_value_1,
                                              surename, name, patronymic) ) {
-        message_window_ptr->set_message(request_manager_ptr->get_last_error());
-        message_window_ptr->exec();
+        show_message(request_manager_ptr->get_last_error());
         unlock_buttons();
         return;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Add)) {
-        message_window_ptr->set_message(QString("Unable to add new user!\n\n%1").arg(error_text));
-        message_window_ptr->exec();
+        show_message(QString("Unable to add new user!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
     }
@@ -158,8 +147,8 @@ void AdminWindow::create_user()
     users_table_model->setData(users_table_model->index(row_number, 4), name, Qt::DisplayRole);
     users_table_model->setData(users_table_model->index(row_number, 5), patronymic, Qt::DisplayRole);
 
-    message_window_ptr->set_message(QString("User %1 has been successfully created").arg(user_name));
-    message_window_ptr->exec();
+    show_message(QString("User %1 has been successfully created").arg(user_name));
+
     unlock_buttons();
 }
 
@@ -169,8 +158,7 @@ void AdminWindow::delete_user()
     const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
-        message_window_ptr->set_message(QString("Choose a user to delete"));
-        message_window_ptr->exec();
+        show_message(QString("Choose a user to delete"));
         return;
     }
 
@@ -183,8 +171,7 @@ void AdminWindow::delete_user()
 
     // Проверяем, нет ли попытки удалить себя.
     if (user_id == own_id) {
-        message_window_ptr->set_message(QString("You are not able to delete yourself!"));
-        message_window_ptr->exec();
+        show_message(QString("You are not able to delete yourself!"));
         return;
     }
 
@@ -196,16 +183,14 @@ void AdminWindow::delete_user()
 
     // Отправляем запрос на удаление пользователя.
     if ( !request_manager_ptr->send_del_user(user_id) ) {
-        message_window_ptr->set_message(request_manager_ptr->get_last_error());
-        message_window_ptr->exec();
+        show_message(request_manager_ptr->get_last_error());
         unlock_buttons();
         return;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Del)) {
-        message_window_ptr->set_message(QString("Unable to delete user %1!\n\n%2").arg(user_to_del, error_text));
-        message_window_ptr->exec();
+        show_message(QString("Unable to delete user %1!\n\n%2").arg(user_to_del, error_text));
         unlock_buttons();
         return;
     }
@@ -231,8 +216,8 @@ void AdminWindow::delete_user()
     // Всем задачам, на которые был назначен пользователь ставим статус "Not appointed" и user_id = 0.
     data_keeper_ptr->reset_tasks_status(user_id);
 
-    message_window_ptr->set_message(QString("User %1 has been successfully deleted").arg(user_to_del));
-    message_window_ptr->exec();
+    show_message(QString("User %1 has been successfully deleted").arg(user_to_del));
+
     unlock_buttons();
 }
 
@@ -242,8 +227,7 @@ void AdminWindow::change_user_type()
     const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
-        message_window_ptr->set_message(QString("Choose a user to change user type"));
-        message_window_ptr->exec();
+        show_message(QString("Choose a user to change user type"));
         return;
     }
 
@@ -260,8 +244,7 @@ void AdminWindow::change_user_type()
 
     // Проверяем, нет ли попытки изменить свой тип.
     if (user_id == own_id) {
-        message_window_ptr->set_message(QString("You are not able to change your type!"));
-        message_window_ptr->exec();
+        show_message(QString("You are not able to change your type!"));
         return;
     }
 
@@ -270,8 +253,7 @@ void AdminWindow::change_user_type()
 
     // Проверяем, не совпадает ли выбранный тип с уже установленным.
     if (user_type == data_keeper_ptr->get_user_data(user_id)->login_type.user_type) {
-        message_window_ptr->set_message(QString("Old and new user types are the same"));
-        message_window_ptr->exec();
+        show_message(QString("Old and new user types are the same"));
         return;
     }
 
@@ -279,16 +261,14 @@ void AdminWindow::change_user_type()
 
     // Отправляем запрос на изменение типа пользователя.
     if ( !request_manager_ptr->send_set_usertype(user_id, user_type) ) {
-        message_window_ptr->set_message(request_manager_ptr->get_last_error());
-        message_window_ptr->exec();
+        show_message(request_manager_ptr->get_last_error());
         unlock_buttons();
         return;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Set)) {
-        message_window_ptr->set_message(QString("Unable to change type of the choosen user\n%1").arg(error_text));
-        message_window_ptr->exec();
+        show_message(QString("Unable to change type of the choosen user\n%1").arg(error_text));
         unlock_buttons();
         return;
     }
@@ -299,9 +279,9 @@ void AdminWindow::change_user_type()
     // Обновляем содержимое ячейки в таблице.
     users_table_model->setData(users_table_model->index(selection.at(0).row(), 2), collector_ptr->type_description(user_type), Qt::DisplayRole);
 
-    message_window_ptr->set_message(QString("User type has been successfully changed to %1")
-                                        .arg(collector_ptr->type_description(user_type)));
-    message_window_ptr->exec();
+    show_message(QString("User type has been successfully changed to %1")
+                                .arg(collector_ptr->type_description(user_type)));
+
     unlock_buttons();
 }
 
@@ -311,8 +291,7 @@ void AdminWindow::change_password()
     const QModelIndexList selection = ui->tvUsers->selectionModel()->selectedRows();
 
     if (selection.isEmpty()) {
-        message_window_ptr->set_message(QString("Choose a user to change password"));
-        message_window_ptr->exec();
+        show_message(QString("Choose a user to change password"));
         return;
     }
 
@@ -338,15 +317,13 @@ void AdminWindow::change_password()
 
     // Не должно быть пустого значения пароля.
     if (pass_value_1.isEmpty() || pass_value_2.isEmpty()) {
-        message_window_ptr->set_message(QString("Both password fields have to be filled in!"));
-        message_window_ptr->exec();
+        show_message(QString("Both password fields have to be filled in!"));
         return;
     }
 
     // Оба значения должны совпадать.
     if (pass_value_1 != pass_value_2) {
-        message_window_ptr->set_message(QString("Password values do not match!"));
-        message_window_ptr->exec();
+        show_message(QString("Password values do not match!"));
         return;
     }
 
@@ -354,22 +331,20 @@ void AdminWindow::change_password()
 
     // Отправляем запрос на изменение пароля пользователя.
     if ( !request_manager_ptr->send_set_password(user_id, pass_value_1) ) {
-        message_window_ptr->set_message(request_manager_ptr->get_last_error());
-        message_window_ptr->exec();
+        show_message(request_manager_ptr->get_last_error());
         unlock_buttons();
         return;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Set)) {
-        message_window_ptr->set_message(QString("Unable to change password for the choosen user\n%1").arg(error_text));
-        message_window_ptr->exec();
+        show_message(QString("Unable to change password for the choosen user\n%1").arg(error_text));
         unlock_buttons();
         return;
     }
 
-    message_window_ptr->set_message(QString("Password for user %1 has been successfully changed")
-                                        .arg(data_keeper_ptr->get_user_data(user_id)->login_type.user_name));
-    message_window_ptr->exec();
+    show_message(QString("Password for user %1 has been successfully changed")
+                                .arg(data_keeper_ptr->get_user_data(user_id)->login_type.user_name));
+
     unlock_buttons();
 }

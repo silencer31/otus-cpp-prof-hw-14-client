@@ -17,7 +17,7 @@ public:
     explicit MessageWindow(QWidget *parent = nullptr);
 
     ~MessageWindow();
-
+    
     void set_message(const QString& message);
 
 private:

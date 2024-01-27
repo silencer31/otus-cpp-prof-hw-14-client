@@ -32,7 +32,25 @@ private: // methods
 
     void unlock_buttons();
 
+    // Показать сообщение пользователю.
+    void show_message(const QString& message);
+
+    // Обработка реакции сервера на сетевой запрос.
     bool handle_request(CommandType comm_type);
+
+    // Запрос возможных типов пользователей.
+    bool get_user_types();
+
+    // Запрос возможных статусов задач.
+    bool get_task_statuses();
+
+    void create_task(); // Создать задачу для себя.
+
+    void take_task(); // Забрать чужую задачу себе.
+
+    void change_task_status(); // Изменить статус своей задачи.
+
+    void set_task_deadline(); // Задать новую дату, до которой д/б выполнена своя задача.
 
 private slots:
     // Реакция на клик по строке в таблице с задачами.

@@ -34,6 +34,10 @@ private: // methods
 
     void unlock_buttons();
 
+    // Показать сообщение пользователю.
+    void show_message(const QString& message);
+
+    // Обработка реакции сервера на сетевой запрос.
     bool handle_request(CommandType comm_type);
 
     // Запрос возможных типов пользователей.

@@ -20,8 +20,7 @@ void OperatorWindow::user_clicked(const QModelIndex& index)
 
     // Проверка определённого значения.
     if ( !ok || user_id <= 0) {
-        message_window_ptr->set_message(QString("Unexpected id error!\nid: %1").arg(QString::number(user_id)));
-        message_window_ptr->exec();
+        show_message(QString("Unexpected id error!\nid: %1").arg(QString::number(user_id)));
         ui->tvUsers->clearSelection();
         return;
     }
@@ -50,8 +49,7 @@ void OperatorWindow::task_clicked(const QModelIndex& index)
 
     // Проверка определённого значения.
     if ( !ok || task_id <= 0) {
-        message_window_ptr->set_message(QString("Unexpected id error!\nid: %1").arg(QString::number(task_id)));
-        message_window_ptr->exec();
+        show_message(QString("Unexpected id error!\nid: %1").arg(QString::number(task_id)));
         ui->tvTasks->clearSelection();
         return;
     }
@@ -66,18 +64,16 @@ void OperatorWindow::task_clicked(const QModelIndex& index)
 // Запрос списка пользователей.
 void OperatorWindow::get_users_list()
 {
-    //Блокируем кнопки
-    lock_buttons();
-
     // Есть ли связь с сервером.
     if (!request_manager_ptr->connected_to_server()) {
-        message_window_ptr->set_message(QString("No connection with server!"));
-        message_window_ptr->exec();
-        unlock_buttons();
+        show_message(QString("No connection with server!"));
         return;
     }
 
-    // Запрос типов пользователей.
+    //Блокируем кнопки
+    lock_buttons();
+
+    // Если не были получены ранее, запрашиваем типы пользователей.
     if ( !get_user_types()) {
         unlock_buttons();
         return;
@@ -85,25 +81,22 @@ void OperatorWindow::get_users_list()
 
     // Запрос списка id пользователей.
     if (!request_manager_ptr->send_get_userlist()) {
-        message_window_ptr->set_message(QString("Unable to send get userlist request!\n\n%1")
-                                            .arg(request_manager_ptr->get_last_error()));
-        message_window_ptr->exec();
+        show_message(QString("Unable to send get userlist request!\n\n%1")
+                                .arg(request_manager_ptr->get_last_error()));
         unlock_buttons();
         return;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Get)) {
-        message_window_ptr->set_message(QString("Unable to get user ids!\n\n%1").arg(error_text));
-        message_window_ptr->exec();
+        show_message(QString("Unable to get user ids!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
     }
 
     // Проверяем, что получено от сервера.
     if (!collector_ptr->user_ids_received()) {
-        message_window_ptr->set_message(QString("Получена пустая коллекция id пользователей"));
-        message_window_ptr->exec();
+        show_message(QString("Получена пустая коллекция id пользователей"));
         unlock_buttons();
         return;
     }
@@ -115,34 +108,30 @@ void OperatorWindow::get_users_list()
     for(auto iter = collector_ptr->user_ids_cib(); iter != collector_ptr->user_ids_cie(); ++iter) {
         // Запрос логина и типа пользователя.
         if (!request_manager_ptr->send_get_username(*iter)) {
-            message_window_ptr->set_message(QString("Unable to send get username request!\n\n%1")
-                                                .arg(request_manager_ptr->get_last_error()));
-            message_window_ptr->exec();
+            show_message(QString("Unable to send get username request!\n\n%1")
+                                    .arg(request_manager_ptr->get_last_error()));
             unlock_buttons();
             return;
         }
 
         // Контроль выполнения запроса.
         if ( !handle_request(CommandType::Get)) {
-            message_window_ptr->set_message(QString("Unable to get user login and type!\n\n%1").arg(error_text));
-            message_window_ptr->exec();
+            show_message(QString("Unable to get user login and type!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
         }
 
         // Запрос ФИО пользователя.
         if (!request_manager_ptr->send_get_fullname(*iter)) {
-            message_window_ptr->set_message(QString("Unable to send get fullname request!\n\n%1")
-                                                .arg(request_manager_ptr->get_last_error()));
-            message_window_ptr->exec();
+            show_message(QString("Unable to send get fullname request!\n\n%1")
+                                    .arg(request_manager_ptr->get_last_error()));
             unlock_buttons();
             return;
         }
 
         // Контроль выполнения запроса.
         if ( !handle_request(CommandType::Get)) {
-            message_window_ptr->set_message(QString("Unable to get user fullname!\n\n%1").arg(error_text));
-            message_window_ptr->exec();
+            show_message(QString("Unable to get user fullname!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
         }
@@ -203,8 +192,7 @@ void OperatorWindow::get_tasks_list()
 
     if (ui->rbChoosen->isChecked()) {
         if (selection.isEmpty()) {
-            message_window_ptr->set_message(QString("Choose a user to request tasks for"));
-            message_window_ptr->exec();
+            show_message(QString("Choose a user to request tasks for"));
             return;
         }
     }
@@ -214,19 +202,18 @@ void OperatorWindow::get_tasks_list()
 
     // Есть ли связь с сервером.
     if (!request_manager_ptr->connected_to_server()) {
-        message_window_ptr->set_message(QString("No connection with server!"));
-        message_window_ptr->exec();
+        show_message(QString("No connection with server!"));
         unlock_buttons();
         return;
     }
 
-    // Запрос типов пользователей.
+    // Если не были получены ранее, запрашиваем типы пользователей.
     if ( !get_user_types()) {
         unlock_buttons();
         return;
     }
 
-    // Запрос возможных статусов задач.
+    // Если не были получены ранее, запрашиваем статусы задач.
     if ( !get_task_statuses()) {
         unlock_buttons();
         return;
@@ -241,25 +228,22 @@ void OperatorWindow::get_tasks_list()
                    );
 
     if (!result) {
-        message_window_ptr->set_message(QString("Unable to send get tasklist request!\n\n%1")
-                                            .arg(request_manager_ptr->get_last_error()));
-        message_window_ptr->exec();
+        show_message(QString("Unable to send get tasklist request!\n\n%1")
+                                .arg(request_manager_ptr->get_last_error()));
         unlock_buttons();
         return;
     }
 
     // Контроль выполнения запроса.
     if ( !handle_request(CommandType::Get)) {
-        message_window_ptr->set_message(QString("Unable to get task ids!\n\n%1").arg(error_text));
-        message_window_ptr->exec();
+        show_message(QString("Unable to get task ids!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
     }
 
     // Проверяем, что получено от сервера.
     if (!collector_ptr->task_ids_received()) {
-        message_window_ptr->set_message(QString("Получена пустая коллекция id задач"));
-        message_window_ptr->exec();
+        show_message(QString("Получена пустая коллекция id задач"));
         unlock_buttons();
         return;
     }
@@ -271,17 +255,15 @@ void OperatorWindow::get_tasks_list()
     for(auto iter = collector_ptr->task_ids_cib(); iter != collector_ptr->task_ids_cie(); ++iter) {
         // Запрос данных задачи.
         if (!request_manager_ptr->send_get_taskdata(*iter)) {
-            message_window_ptr->set_message(QString("Unable to send get taskdata request!\n\n%1")
-                                                .arg(request_manager_ptr->get_last_error()));
-            message_window_ptr->exec();
+            show_message(QString("Unable to send get taskdata request!\n\n%1")
+                                    .arg(request_manager_ptr->get_last_error()));
             unlock_buttons();
             return;
         }
 
         // Контроль выполнения запроса.
         if ( !handle_request(CommandType::Get)) {
-            message_window_ptr->set_message(QString("Unable to get task data!\n\n%1").arg(error_text));
-            message_window_ptr->exec();
+            show_message(QString("Unable to get task data!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
         }
@@ -349,9 +331,8 @@ void OperatorWindow::add_or_edit_task()
         appoint_user();
         return;
     }
-
-    message_window_ptr->set_message(QString("Choose an action"));
-    message_window_ptr->exec();
+    
+    show_message(QString("Choose an action"));
 }
 
 // Очистить поля ввода.

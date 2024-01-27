@@ -60,6 +60,10 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
     //ui->tvUsers->setSelectionMode(QAbstractItemView::NoSelection);
     ui->tvTasks->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+    // Нажатие по строке в таблице с пользователями.
+    connect(ui->tvTasks, SIGNAL(clicked(const QModelIndex &)),
+            this, SLOT(task_clicked(const QModelIndex &)));
+
     connect(ui->pbGetTasks, SIGNAL(clicked(bool)), this, SLOT(get_tasks_list()) );
     connect(ui->pbApply, SIGNAL(clicked(bool)), this, SLOT(add_or_edit_task()) );
     connect(ui->pbClear, SIGNAL(clicked(bool)), this, SLOT(clear_fields()) );
@@ -85,6 +89,14 @@ void UserWindow::unlock_buttons()
     ui->pbExit->setEnabled(true);
 }
 
+// Показать сообщение пользователю.
+void UserWindow::show_message(const QString& message)
+{
+    message_window_ptr->set_message(message);
+    message_window_ptr->exec();
+}
+
+// Обработка реакции сервера на сетевой запрос.
 bool UserWindow::handle_request(CommandType comm_type)
 {
     // Пытаемся получить ответ от сервера.
