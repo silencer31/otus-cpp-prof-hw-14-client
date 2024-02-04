@@ -70,12 +70,6 @@ void AdminWindow::get_users_list()
     //Блокируем кнопки
     lock_buttons();
 
-    // Запрос типов пользователей.
-    if ( !get_user_types()) {
-        unlock_buttons();
-        return;
-    }
-
     // Запрос списка id пользователей.
     if (!request_manager_ptr->send_get_userlist()) {
         show_message(QString("Unable to send get userlist request!\n\n%1")
@@ -85,7 +79,7 @@ void AdminWindow::get_users_list()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
+    if ( !handler_ptr->handle_request(CommandType::Get)) {
         show_message(QString("Unable to get user ids!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
@@ -112,7 +106,7 @@ void AdminWindow::get_users_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get user login and type!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -127,7 +121,7 @@ void AdminWindow::get_users_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get user fullname!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -179,6 +173,7 @@ void AdminWindow::get_users_list()
                                 Qt::DisplayRole);
     }
 
+    ui->tvUsers->clearSelection();
     unlock_buttons();
 }
 
@@ -194,19 +189,6 @@ void AdminWindow::get_tasks_list()
     //Блокируем кнопки
     lock_buttons();
 
-    // Если не были получены ранее, запрашиваем типы пользователей.
-    if ( !get_user_types()) {
-        unlock_buttons();
-        return;
-    }
-
-    // Если не были получены ранее, запрашиваем статусы задач.
-    if ( !get_task_statuses()) {
-        unlock_buttons();
-        return;
-    }
-
-
     // Запрос списка id задач.
     bool result = (ui->checkbOnlyOwn->isChecked()
                   ? request_manager_ptr->send_get_tasklist(own_id)
@@ -220,7 +202,7 @@ void AdminWindow::get_tasks_list()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
+    if ( !handler_ptr->handle_request(CommandType::Get)) {
         show_message(QString("Unable to get task ids!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
@@ -247,7 +229,7 @@ void AdminWindow::get_tasks_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get task data!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -281,6 +263,7 @@ void AdminWindow::get_tasks_list()
                                    Qt::DisplayRole);        
     }
 
+    ui->tvTasks->clearSelection();
     unlock_buttons();
 }
 
@@ -340,7 +323,7 @@ void AdminWindow::shutdown_server()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Shutdown)) {
+    if ( !handler_ptr->handle_request(CommandType::Shutdown)) {
         show_message(QString("Unable to shutdown server!\n%1").arg(error_text));
     }
 

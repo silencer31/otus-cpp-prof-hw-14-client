@@ -40,6 +40,10 @@ void UserWindow::task_clicked(const QModelIndex& index)
         return;
     }
 
+    if (!data_keeper_ptr->users_containes(user_id)) {
+        return;
+    }
+
     const auto iter = data_keeper_ptr->get_user_data(user_id);
 
     ui->leFullname->setText(QString("%1 %2 %3")
@@ -58,18 +62,6 @@ void UserWindow::get_tasks_list()
     //Блокируем кнопки
     lock_buttons();
 
-    // Если не были получены ранее, запрашиваем типы пользователей.
-    if ( !get_user_types()) {
-        unlock_buttons();
-        return;
-    }
-
-    // Если не были получены ранее, запрашиваем статусы задач.
-    if ( !get_task_statuses()) {
-        unlock_buttons();
-        return;
-    }
-
     // Запрос списка id задач.
     bool result = (ui->checkbOnlyOwn->isChecked()
                        ? request_manager_ptr->send_get_tasklist(own_id)
@@ -83,7 +75,7 @@ void UserWindow::get_tasks_list()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
+    if ( !handler_ptr->handle_request(CommandType::Get)) {
         show_message(QString("Unable to get task ids!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
@@ -113,7 +105,7 @@ void UserWindow::get_tasks_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get task data!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -140,7 +132,7 @@ void UserWindow::get_tasks_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get user login and type!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -155,7 +147,7 @@ void UserWindow::get_tasks_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get user fullname!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -189,7 +181,7 @@ void UserWindow::get_tasks_list()
                                    Qt::DisplayRole);
     }
 
-
+    ui->tvTasks->clearSelection();
     unlock_buttons();
 }
 

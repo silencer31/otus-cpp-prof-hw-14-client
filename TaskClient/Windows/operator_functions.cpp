@@ -1,73 +1,6 @@
 #include "operatorwindow.h"
 #include "ui_operatorwindow.h"
 
-// Запрос возможных типов пользователей.
-bool OperatorWindow::get_user_types()
-{
-    // Проверяем, был ли ранее получен список типов пользователей.
-    if (collector_ptr->user_types_received()) {
-        return true;
-    }
-
-    // Запрос списка типа пользователей.
-    if (!request_manager_ptr->send_get_typelist()) {
-        show_message(QString("Unable to send get typelist request!\n\n%1")
-                                    .arg(request_manager_ptr->get_last_error()));
-        return false;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
-        show_message(QString("Unable to get user types!\n\n%1").arg(error_text));
-        return false;
-    }
-
-    // Проверяем, что получено от сервера.
-    if (!collector_ptr->user_types_received()) {
-        show_message(QString("Получена пустая коллекция типов пользователей"));
-        return false;
-    }
-
-    return true;
-}
-
-// Запрос возможных статусов задач.
-bool OperatorWindow::get_task_statuses()
-{
-    // Проверяем, был ли ранее получен список статусов задач.
-    if (collector_ptr->task_statuses_received()) {
-        return true;
-    }
-
-    // Запрос списка статусов задач.
-    if (!request_manager_ptr->send_get_statuslist()) {
-        show_message(QString("Unable to send get statuslist request!\n\n%1")
-                                    .arg(request_manager_ptr->get_last_error()));
-        return false;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
-        show_message(QString("Unable to get task statuses!\n\n%1").arg(error_text));
-        return false;
-    }
-
-    // Проверяем, что получено от сервера.
-    if (!collector_ptr->task_statuses_received()) {
-        show_message(QString("Получена пустая коллекция статусов задач"));
-        return false;
-    }
-
-    // Обновляем список доступных статусов в выпадающем меню.
-    ui->cbTaskStatus->clear();
-
-    for(auto iter = collector_ptr->task_statuses_cib(); iter != collector_ptr->task_statuses_cie(); ++iter) {
-        ui->cbTaskStatus->addItem(QString("%1 : %2").arg(QString::number(iter.key()), iter.value()));
-    }
-
-    return true;
-}
-
 // Создать новую задачу.
 void OperatorWindow::create_task()
 {
@@ -114,7 +47,7 @@ void OperatorWindow::create_task()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Add)) {
+    if ( !handler_ptr->handle_request(CommandType::Add)) {
         show_message(QString("Unable to add new task!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
@@ -174,7 +107,7 @@ void OperatorWindow::delete_task()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Del)) {
+    if ( !handler_ptr->handle_request(CommandType::Del)) {
         show_message(QString("Unable to delete task\n%1!\n\n%2")
                                 .arg(task_to_del, error_text));
         unlock_buttons();
@@ -219,7 +152,7 @@ void OperatorWindow::change_task_status()
         return;
     }
 
-    const int status = ui->cbTaskStatus->currentIndex()+1;
+    const int status = ui->comboTaskStatus->currentIndex()+1;
 
     // Проверяем чтобы текущий и новый статус не совпадали.
     if (status == data_keeper_ptr->get_task_data(task_id)->status) {
@@ -238,7 +171,7 @@ void OperatorWindow::change_task_status()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Set)) {
+    if ( !handler_ptr->handle_request(CommandType::Set)) {
         show_message(QString("Unable to change status for\ntask %1!\n\n%2")
                                     .arg(task_name, error_text));
         unlock_buttons();
@@ -308,7 +241,7 @@ void OperatorWindow::set_task_deadline()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Set)) {
+    if ( !handler_ptr->handle_request(CommandType::Set)) {
         show_message(QString("Unable to change deadline for\ntask %1!\n\n%2")
                                 .arg(task_name, error_text));
         unlock_buttons();
@@ -378,7 +311,7 @@ void OperatorWindow::appoint_user()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Set)) {
+    if ( !handler_ptr->handle_request(CommandType::Set)) {
         show_message(QString("Unable to change user for\ntask %1!\n\n%2")
                                     .arg(task_name, error_text));
         unlock_buttons();
@@ -397,7 +330,7 @@ void OperatorWindow::appoint_user()
         tasks_table_model->setData(tasks_table_model->index(task_selection.at(0).row(), 1),
                                    collector_ptr->status_description(2), Qt::DisplayRole);
 
-        ui->cbTaskStatus->setCurrentIndex(1);
+        ui->comboTaskStatus->setCurrentIndex(1);
     }
 
     // Обновляем содержимое ячейки в таблице.

@@ -1,75 +1,6 @@
 #include "adminwindow.h"
 #include "ui_adminwindow.h"
 
-// Запрос возможных типов пользователей и статусов задач.
-bool AdminWindow::get_user_types()
-{
-    // Проверяем, был ли ранее получен список типов пользователей.
-    if (collector_ptr->user_types_received()) {
-        return true;
-    }
-
-    // Запрос списка типа пользователей.
-    if (!request_manager_ptr->send_get_typelist()) {
-        show_message(QString("Unable to send get typelist request!\n\n%1")
-                                            .arg(request_manager_ptr->get_last_error()));
-        return false;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
-        show_message(QString("Unable to get user types!\n\n%1").arg(error_text));
-        return false;
-    }
-
-    // Проверяем, что получено от сервера.
-    if (!collector_ptr->user_types_received()) {
-        show_message(QString("Получена пустая коллекция типов пользователей"));
-        return false;
-    }
-
-
-    // Обновляем список доступных типов в выпадающем меню.
-    ui->cbUserType->clear();
-
-    for(auto iter = collector_ptr->user_types_cib(); iter != collector_ptr->user_types_cie(); ++iter) {
-        ui->cbUserType->addItem(QString("%1 : %2").arg(QString::number(iter.key()), iter.value()));
-    }
-
-    return true;
-}
-
-// Запрос возможных статусов задач.
-bool AdminWindow::get_task_statuses()
-{
-    // Проверяем, был ли ранее получен список статусов задач.
-    if (collector_ptr->task_statuses_received()) {
-        return true;
-    }
-
-    // Запрос списка статусов задач.
-    if (!request_manager_ptr->send_get_statuslist()) {
-        show_message(QString("Unable to send get statuslist request!\n\n%1")
-                                            .arg(request_manager_ptr->get_last_error()));
-        return false;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
-        show_message(QString("Unable to get task statuses!\n\n%1").arg(error_text));
-        return false;
-    }
-
-    // Проверяем, что получено от сервера.
-    if (collector_ptr->task_statuses_received()) {
-        return true;
-    }
-
-    show_message(QString("Получена пустая коллекция статусов задач"));
-
-    return false;
-}
-
 // Запрос на создание нового пользователя.
 void AdminWindow::create_user()
 {
@@ -124,7 +55,7 @@ void AdminWindow::create_user()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Add)) {
+    if ( !handler_ptr->handle_request(CommandType::Add)) {
         show_message(QString("Unable to add new user!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
@@ -189,7 +120,7 @@ void AdminWindow::delete_user()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Del)) {
+    if ( !handler_ptr->handle_request(CommandType::Del)) {
         show_message(QString("Unable to delete user %1!\n\n%2").arg(user_to_del, error_text));
         unlock_buttons();
         return;
@@ -267,7 +198,7 @@ void AdminWindow::change_user_type()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Set)) {
+    if ( !handler_ptr->handle_request(CommandType::Set)) {
         show_message(QString("Unable to change type of the choosen user\n%1").arg(error_text));
         unlock_buttons();
         return;
@@ -337,7 +268,7 @@ void AdminWindow::change_password()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Set)) {
+    if ( !handler_ptr->handle_request(CommandType::Set)) {
         show_message(QString("Unable to change password for the choosen user\n%1").arg(error_text));
         unlock_buttons();
         return;

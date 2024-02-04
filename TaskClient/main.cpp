@@ -20,6 +20,9 @@ int main(int argc, char *argv[])
     // Парсер json ответов от сервера.
     const parser_shared parser_ptr{ std::make_shared<ReplyParser>(collector_ptr)};
 
+    // Обработчик ответов от сервера на запросы.
+    const handler_shared handler_ptr{ std::make_shared<Handler>(request_manager_ptr, collector_ptr, parser_ptr) };
+
     // Хранитель полученных данных о пользователях и задачах.
     const data_keeper_shared data_keeper_ptr{ std::make_shared<DataKeeper>()};
 
@@ -33,6 +36,20 @@ int main(int argc, char *argv[])
     if ( !request_manager_ptr->connected_to_server()) {
         message_window_ptr->set_message(QString("Unable to connect to server\n%1")
                                         .arg(request_manager_ptr->get_last_error()));
+        message_window_ptr->exec();
+        return 1;
+    }
+
+    // Запрос типов пользователей.
+    if ( !handler_ptr->get_user_types()) {
+        message_window_ptr->set_message(QString("Unable to get user types\n%1").arg(handler_ptr->get_error()));
+        message_window_ptr->exec();
+        return 1;
+    }
+
+    // Запрос возможных статусов задач.
+    if ( !handler_ptr->get_task_statuses()) {
+        message_window_ptr->set_message(QString("Unable to get task statuses\n%1").arg(handler_ptr->get_error()));
         message_window_ptr->exec();
         return 1;
     }
@@ -59,59 +76,32 @@ int main(int argc, char *argv[])
 
         passwd_window_ptr->clear_fields();
 
-        // Отправляем запрос логин на сервер.
-        if ( !request_manager_ptr->send_login(user_name, password) ) {
-            message_window_ptr->set_message(request_manager_ptr->get_last_error());
-            message_window_ptr->exec();
-            return 1;
-        }
-
-        std::string server_reply;
-
-        // Пытаемся получить ответ от сервера.
-        if (!request_manager_ptr->get_server_answer(server_reply)) {
-            message_window_ptr->set_message(request_manager_ptr->get_last_error());
-            message_window_ptr->exec();
-            return 1;
-        }
-
-        // Пробуем распарсить в json ответ от сервера.
-        if ( !parser_ptr->handle_reply( CommandType::Login, server_reply)) {
-            message_window_ptr->set_message(QString("Unable to parse server reply\n%1").arg(parser_ptr->get_last_error()));
-            message_window_ptr->exec();
-            return 1;
-        }
-
-        // Проверка наличия ошибки в запросе
-        if (collector_ptr->req_error()) {
-            message_window_ptr->set_message(QString("Unable to perform request!\n%1").arg(collector_ptr->get_error_text()));
-            message_window_ptr->exec();
-            return 1;
-        }
-
-        // Проверяем, удалось ли провести логин на сервере.
-        if (collector_ptr->get_result()) {
+        // Пробуем выполнить логин на сервере.
+        if (handler_ptr->login_on_server(user_name, password)) {
             break;
         }
 
         // Показываем сообщение о неудачном логине.
-        message_window_ptr->set_message(QString("Unable to login on server\n%1").arg(collector_ptr->get_details()));
+        message_window_ptr->set_message(QString("Unable to login on server\n%1").arg(handler_ptr->get_error()));
         message_window_ptr->exec();
     }
 
-    // Меняем надписи для дальнейшего использования окна для смены пароля.
+    // В окне для логина и пароля меняем надписи для дальнейшего использования окна для смены пароля.
     passwd_window_ptr->change_labels();
 
     // Окно для задач администратора.
-    const admin_win_unique admin_window_ptr(new AdminWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,
+    const admin_win_unique admin_window_ptr(new AdminWindow(request_manager_ptr, collector_ptr, parser_ptr,
+                                                            handler_ptr, data_keeper_ptr,
                                                             message_window_ptr, passwd_window_ptr, user_name));
 
     // Окно для задач оператора базы данных.
-    const operator_win_unique operator_window_ptr(new OperatorWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,
+    const operator_win_unique operator_window_ptr(new OperatorWindow(request_manager_ptr, collector_ptr, parser_ptr,
+                                                                     handler_ptr, data_keeper_ptr,
                                                                      message_window_ptr, passwd_window_ptr, user_name));
 
     // Окно для задач обычного пользователя.
-    const user_win_unique user_window_ptr(new UserWindow(request_manager_ptr, collector_ptr, parser_ptr, data_keeper_ptr,
+    const user_win_unique user_window_ptr(new UserWindow(request_manager_ptr, collector_ptr, parser_ptr,
+                                                         handler_ptr, data_keeper_ptr,
                                                          message_window_ptr, passwd_window_ptr, user_name));
 
     UserType user_type{UserType::Unsupported};

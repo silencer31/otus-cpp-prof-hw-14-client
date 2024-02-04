@@ -58,7 +58,7 @@ void OperatorWindow::task_clicked(const QModelIndex& index)
     ui->leDeadLine->setText( data_keeper_ptr->get_task_data(task_id)->deadline );
     ui->leDescription->setText( data_keeper_ptr->get_task_data(task_id)->description );
 
-    ui->cbTaskStatus->setCurrentIndex(data_keeper_ptr->get_task_data(task_id)->status - 1);
+    ui->comboTaskStatus->setCurrentIndex(data_keeper_ptr->get_task_data(task_id)->status - 1);
 }
 
 // Запрос списка пользователей.
@@ -73,12 +73,6 @@ void OperatorWindow::get_users_list()
     //Блокируем кнопки
     lock_buttons();
 
-    // Если не были получены ранее, запрашиваем типы пользователей.
-    if ( !get_user_types()) {
-        unlock_buttons();
-        return;
-    }
-
     // Запрос списка id пользователей.
     if (!request_manager_ptr->send_get_userlist()) {
         show_message(QString("Unable to send get userlist request!\n\n%1")
@@ -88,7 +82,7 @@ void OperatorWindow::get_users_list()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
+    if ( !handler_ptr->handle_request(CommandType::Get)) {
         show_message(QString("Unable to get user ids!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
@@ -115,7 +109,7 @@ void OperatorWindow::get_users_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get user login and type!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -130,7 +124,7 @@ void OperatorWindow::get_users_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get user fullname!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -182,6 +176,7 @@ void OperatorWindow::get_users_list()
                             Qt::DisplayRole);
     }
 
+    ui->tvUsers->clearSelection();
     unlock_buttons();
 }
 
@@ -207,18 +202,6 @@ void OperatorWindow::get_tasks_list()
         return;
     }
 
-    // Если не были получены ранее, запрашиваем типы пользователей.
-    if ( !get_user_types()) {
-        unlock_buttons();
-        return;
-    }
-
-    // Если не были получены ранее, запрашиваем статусы задач.
-    if ( !get_task_statuses()) {
-        unlock_buttons();
-        return;
-    }
-
     // Запрос списка id задач.
     bool result = (ui->rbChoosen->isChecked()
                        ? request_manager_ptr->send_get_tasklist(users_table_model->item(selection.at(0).row())->data().toInt())
@@ -235,7 +218,7 @@ void OperatorWindow::get_tasks_list()
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
+    if ( !handler_ptr->handle_request(CommandType::Get)) {
         show_message(QString("Unable to get task ids!\n\n%1").arg(error_text));
         unlock_buttons();
         return;
@@ -262,7 +245,7 @@ void OperatorWindow::get_tasks_list()
         }
 
         // Контроль выполнения запроса.
-        if ( !handle_request(CommandType::Get)) {
+        if ( !handler_ptr->handle_request(CommandType::Get)) {
             show_message(QString("Unable to get task data!\n\n%1").arg(error_text));
             unlock_buttons();
             return;
@@ -296,6 +279,7 @@ void OperatorWindow::get_tasks_list()
                                    Qt::DisplayRole);
     }
 
+    ui->tvTasks->clearSelection();
     unlock_buttons();
 }
 

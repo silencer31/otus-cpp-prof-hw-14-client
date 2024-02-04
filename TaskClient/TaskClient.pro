@@ -19,6 +19,7 @@ win32 {
 SOURCES += \
     Data/collector.cpp \
     Data/data_keeper.cpp \
+    Handler/handler.cpp \
     Network/requestmanager_add.cpp \
     Network/requestmanager_del.cpp \
     Network/requestmanager_get.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     Data/data_collections.h \
     Data/data_keeper.h \
     Data/data_types.h \
+    Handler/handler.h \
     Parser/replyparser.h \
     Windows/simple_delegate.h \
     Windows/adminwindow.h \

@@ -7,13 +7,14 @@
 #include "passwdwindow.h"
 #include "simple_delegate.h"
 
+#include "Handler/handler.h"
 #include "Data/data_keeper.h"
-#include "Network/requestmanager.h"
-#include "Parser/replyparser.h"
 
+QT_BEGIN_NAMESPACE
 namespace Ui {
 class OperatorWindow;
 }
+QT_END_NAMESPACE
 
 class OperatorWindow : public QMainWindow
 {
@@ -22,8 +23,8 @@ class OperatorWindow : public QMainWindow
 public:
     OperatorWindow() = delete;
 
-    explicit OperatorWindow(const req_mngr_shared rm_ptr, const collector_shared cltr_ptr,
-                            const parser_shared par_ptr, const data_keeper_shared dk_ptr,
+    explicit OperatorWindow(const req_mngr_shared rm_ptr, const collector_shared cltr_ptr, const parser_shared par_ptr,
+                            const handler_shared hdlr_ptr,const data_keeper_shared dk_ptr,
                             const message_win_shared mw_ptr, const passwd_win_shared pwd_ptr,
                             const QString& uname, QWidget *parent = nullptr);
 
@@ -36,15 +37,6 @@ private: // methods
 
     // Показать сообщение пользователю.
     void show_message(const QString& message);
-
-    // Обработка реакции сервера на сетевой запрос.
-    bool handle_request(CommandType comm_type);
-
-    // Запрос возможных типов пользователей.
-    bool get_user_types();
-
-    // Запрос возможных статусов задач.
-    bool get_task_statuses();
 
     void create_task(); // Создать новую задачу.
 
@@ -76,6 +68,7 @@ private: // data
     const req_mngr_shared request_manager_ptr;
     const collector_shared collector_ptr;
     const parser_shared parser_ptr;
+    const handler_shared handler_ptr;  // Обработчик ответов от сервера на запросы.
     const data_keeper_shared data_keeper_ptr;
 
     const message_win_shared message_window_ptr;
