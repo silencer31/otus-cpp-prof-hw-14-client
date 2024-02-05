@@ -10,7 +10,7 @@
 
 /***********
  *
- *  Этот класс помогает обрабатывать ответ от сервера на запросы.
+ *  Этот класс помогает отправлять запросы и обрабатывать ответы от сервера.
  *
  * ********/
 
@@ -27,8 +27,18 @@ public:
 
     ~Handler() = default;
 
+    const QString& get_error() {
+        return error_text;
+    }
+
     // Обработка реакции сервера на сетевой запрос.
     bool handle_request(CommandType comm_type);
+
+    // Тестовый запрос серверу.
+    bool test_request();
+
+    // Выключить сервер.
+    bool shutdown_server();
 
     // Запрос возможных типов пользователей.
     bool get_user_types();
@@ -39,9 +49,27 @@ public:
     // Логин пользователя на сервере.
     bool login_on_server(const QString& user_name, const QString& password);
 
-    const QString& get_error() {
-        return error_text;
-    }
+    // Запрос списка пользователей.
+    bool get_users_list();
+
+    // Получить логин и тип пользователя по user id.
+    bool get_username(const int id);
+
+    // Получить ФИО пользователя по user id.
+    bool get_fullname(const int id);
+
+    // Запрос списка задач.
+    bool get_taskslist(const int user_id = -1);
+
+    // Получить данные задачи по task id.
+    bool get_taskdata(const int id);
+
+    // Создать нового пользователя.
+    bool create_user(const QString& user_name, int user_type, const QString& pass,
+                     const QString& second, const QString& first, const QString& patron);
+
+    // Удалить пользователя.
+    bool delete_user(const int user_id);
 
 private:
     const req_mngr_shared request_manager_ptr;

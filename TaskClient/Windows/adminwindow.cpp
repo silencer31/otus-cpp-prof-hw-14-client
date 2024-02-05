@@ -157,15 +157,9 @@ void AdminWindow::check_server()
         return;
     }
 
-    // Отправляем тестовый запрос, чтобы узнать, готов ли сервер обрабатывать запросы.
-    if (!request_manager_ptr->send_test_request()) {
-        show_message(QString("Unable to send test request!\n%1").arg(request_manager_ptr->get_last_error()));
+    if ( !handler_ptr->test_request()) {
+        show_message(QString("Test request error\n%1").arg(handler_ptr->get_error()));
         return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Test)) {
-        show_message(QString("Server is unable to handle requests!\n%1").arg(error_text));
     }
 
     show_message(QString("Server is ready to receive requests"));

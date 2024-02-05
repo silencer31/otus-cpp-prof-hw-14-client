@@ -47,16 +47,8 @@ void AdminWindow::create_user()
     lock_buttons();
 
     // Отправляем запрос на создание нового пользователя.
-    if ( !request_manager_ptr->send_add_user(user_name, user_type, pass_value_1,
-                                             surename, name, patronymic) ) {
-        show_message(request_manager_ptr->get_last_error());
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Add)) {
-        show_message(QString("Unable to add new user!\n\n%1").arg(error_text));
+    if ( !handler_ptr->create_user(user_name, user_type, pass_value_1, surename, name, patronymic) ) {
+        show_message( QString("Unable to create new user\n%1").arg(handler_ptr->get_error()));
         unlock_buttons();
         return;
     }
@@ -113,15 +105,8 @@ void AdminWindow::delete_user()
     // При удалении пользователя, все задачи, которые были на него назначены должны перейти в статус "not appointed".
 
     // Отправляем запрос на удаление пользователя.
-    if ( !request_manager_ptr->send_del_user(user_id) ) {
-        show_message(request_manager_ptr->get_last_error());
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Del)) {
-        show_message(QString("Unable to delete user %1!\n\n%2").arg(user_to_del, error_text));
+    if ( !handler_ptr->delete_user(user_id) ) {
+        show_message( QString("Unable to delete user %1\n%2").arg(user_to_del, handler_ptr->get_error()));
         unlock_buttons();
         return;
     }

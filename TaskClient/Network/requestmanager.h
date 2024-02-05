@@ -51,19 +51,19 @@ public:
 
     bool send_shutdown();
 
-    bool send_get_username(const int id);
+    bool send_get_username(const int id); // Получить логин и тип пользователя по user id.
 
-    bool send_get_fullname(const int id);
+    bool send_get_fullname(const int id); // Получить ФИО пользователя по user id.
 
-    bool send_get_userlist();
+    bool send_get_userlist(); // Получить список всех id пользователей.
 
-    bool send_get_tasklist(const int id = -1);
+    bool send_get_tasklist(const int id = -1); // Если указан user_id, получить список его задач, а если не указан, то список всех задач.
 
-    bool send_get_typelist();
+    bool send_get_typelist(); // Получить список возможных типов пользователя и список с их описанием.
 
-    bool send_get_statuslist();
+    bool send_get_statuslist(); // Получить список возможных статусов задачи и список с их описанием.
 
-    bool send_get_taskdata(const int id);
+    bool send_get_taskdata(const int id); // Получить данные задачи по task id.
 
     bool send_add_user(const QString& user_name, const int user_type, const QString& pass,
                        const QString& second, const QString& first, const QString& patron);
