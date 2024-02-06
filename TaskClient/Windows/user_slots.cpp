@@ -64,26 +64,11 @@ void UserWindow::get_tasks_list()
 
     // Запрос списка id задач.
     bool result = (ui->checkbOnlyOwn->isChecked()
-                       ? request_manager_ptr->send_get_tasklist(own_id)
-                       : request_manager_ptr->send_get_tasklist());
+                       ? handler_ptr->get_taskslist(own_id)
+                       : handler_ptr->get_taskslist());
 
     if (!result) {
-        show_message(QString("Unable to send get tasklist request!\n\n%1")
-                         .arg(request_manager_ptr->get_last_error()));
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Get)) {
-        show_message(QString("Unable to get task ids!\n\n%1").arg(error_text));
-        unlock_buttons();
-        return;
-    }
-
-    // Проверяем, что получено от сервера.
-    if (!collector_ptr->task_ids_received()) {
-        show_message(QString("Получена пустая коллекция id задач"));
+        show_message(QString("Unable to get tasks list\n%1").arg(handler_ptr->get_error()));
         unlock_buttons();
         return;
     }
@@ -97,16 +82,8 @@ void UserWindow::get_tasks_list()
     // Для всех полученных id запрашиваем данные задачи и данные исполнителя.
     for(auto iter = collector_ptr->task_ids_cib(); iter != collector_ptr->task_ids_cie(); ++iter) {
         // Запрос данных задачи.
-        if (!request_manager_ptr->send_get_taskdata(*iter)) {
-            show_message(QString("Unable to send get taskdata request!\n\n%1")
-                             .arg(request_manager_ptr->get_last_error()));
-            unlock_buttons();
-            return;
-        }
-
-        // Контроль выполнения запроса.
-        if ( !handler_ptr->handle_request(CommandType::Get)) {
-            show_message(QString("Unable to get task data!\n\n%1").arg(error_text));
+        if (!handler_ptr->get_taskdata(*iter)) {
+            show_message(QString("Unable to get taskdata\n%1").arg(handler_ptr->get_error()));
             unlock_buttons();
             return;
         }
@@ -123,32 +100,16 @@ void UserWindow::get_tasks_list()
         }
 
         // Для каждой задачи запрашиваем данные пользователя - исполнителя.
-        // Запрос логина и типа пользователя.
-        if (!request_manager_ptr->send_get_username(user_id)) {
-            show_message(QString("Unable to send get username request!\n\n%1")
-                             .arg(request_manager_ptr->get_last_error()));
-            unlock_buttons();
-            return;
-        }
-
-        // Контроль выполнения запроса.
-        if ( !handler_ptr->handle_request(CommandType::Get)) {
-            show_message(QString("Unable to get user login and type!\n\n%1").arg(error_text));
+        // Запрос логина и типа пользователя по user id.
+        if (!handler_ptr->get_username(user_id)) {
+            show_message(QString("Unable to get login and user type\n%1").arg(handler_ptr->get_error()));
             unlock_buttons();
             return;
         }
 
         // Запрос ФИО пользователя.
-        if (!request_manager_ptr->send_get_fullname(user_id)) {
-            show_message(QString("Unable to send get fullname request!\n\n%1")
-                             .arg(request_manager_ptr->get_last_error()));
-            unlock_buttons();
-            return;
-        }
-
-        // Контроль выполнения запроса.
-        if ( !handler_ptr->handle_request(CommandType::Get)) {
-            show_message(QString("Unable to get user fullname!\n\n%1").arg(error_text));
+        if (!handler_ptr->get_fullname(user_id)) {
+            show_message(QString("Unable to get user fullname\n%1").arg(handler_ptr->get_error()));
             unlock_buttons();
             return;
         }
@@ -224,4 +185,3 @@ void UserWindow::clear_fields()
 
     ui->tvTasks->clearSelection();
 }
-

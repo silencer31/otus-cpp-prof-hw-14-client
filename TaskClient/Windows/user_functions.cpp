@@ -23,15 +23,8 @@ void UserWindow::create_task()
     lock_buttons();
 
     // Отправляем запрос на создание новой задачи.
-    if ( !request_manager_ptr->send_add_task(own_id, deadline, task_name, description) ) {
-        show_message(request_manager_ptr->get_last_error());
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Add)) {
-        show_message(QString("Unable to add new task!\n\n%1").arg(error_text));
+    if ( !handler_ptr->create_task(own_id, deadline, task_name, description) ) {
+        show_message(QString("Unable to add new task\n%1").arg(handler_ptr->get_error()));
         unlock_buttons();
         return;
     }
@@ -95,17 +88,10 @@ void UserWindow::take_task()
 
     lock_buttons();
 
-    // Отправляем запрос на удаление задачи.
-    if ( !request_manager_ptr->send_set_taskuser(task_id, own_id) ) {
-        show_message(request_manager_ptr->get_last_error());
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Set)) {
-        show_message(QString("Unable to take task\n%1!\n\n%2")
-                         .arg(task_to_take, error_text));
+    // Устанавливаем себя как исполнителя задачи.
+    if ( !handler_ptr->appoint_task_user(task_id, own_id) ) {
+        show_message(QString("Unable to take task\n%1\n%2")
+                         .arg(task_to_take, handler_ptr->get_error()));
         unlock_buttons();
         return;
     }
@@ -185,17 +171,10 @@ void UserWindow::change_task_status()
 
     lock_buttons();
 
-    // Отправляем запрос на изменение статуса задачи.
-    if ( !request_manager_ptr->send_set_taskstatus(task_id, status) ) {
-        show_message(request_manager_ptr->get_last_error());
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Set)) {
-        show_message(QString("Unable to change status for\ntask %1!\n\n%2")
-                         .arg(task_name, error_text));
+    // Измененяем статус задачи.
+    if ( !handler_ptr->change_task_status(task_id, status) ) {
+        show_message(QString("Unable to change status for task\n%1\n%2")
+                         .arg(task_name, handler_ptr->get_error()));
         unlock_buttons();
         return;
     }
@@ -261,16 +240,9 @@ void UserWindow::set_task_deadline()
     lock_buttons();
 
     // Отправляем запрос на изменение deadline задачи.
-    if ( !request_manager_ptr->send_set_deadline(task_id, deadline) ) {
-        show_message(request_manager_ptr->get_last_error());
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Set)) {
-        show_message(QString("Unable to change deadline for\ntask %1!\n\n%2")
-                         .arg(task_name, error_text));
+    if ( !handler_ptr->set_task_deadline(task_id, deadline) ) {
+        show_message(QString("Unable to change deadline for task\n%1\n%2")
+                        .arg(task_name, handler_ptr->get_error()));
         unlock_buttons();
         return;
     }

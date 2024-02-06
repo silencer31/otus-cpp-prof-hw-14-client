@@ -71,6 +71,27 @@ public:
     // Удалить пользователя.
     bool delete_user(const int user_id);
 
+    // Изменить тип пользователя.
+    bool change_usertype(const int user_id, const int user_type);
+
+    // Установить новый пароль пользователю.
+    bool set_password(const int user_id, const QString& password);
+
+    // Создать новую задачу.
+    bool create_task(const int user_id, const QString& deadline, const QString& name, const QString& description);
+
+    // Удалить задачу по её id.
+    bool delete_task(const int task_id);
+
+    // Изменить статус задачи.
+    bool change_task_status(const int task_id, const int status);
+
+    // Изменить deadline задачи.
+    bool set_task_deadline(const int task_id, const QString& deadline);
+
+    // Назначить пользователя на задачу.
+    bool appoint_task_user(const int task_id, const int user_id);
+
 private:
     const req_mngr_shared request_manager_ptr;
     const collector_shared collector_ptr;

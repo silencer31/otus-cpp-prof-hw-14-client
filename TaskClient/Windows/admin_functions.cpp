@@ -176,15 +176,8 @@ void AdminWindow::change_user_type()
     lock_buttons();
 
     // Отправляем запрос на изменение типа пользователя.
-    if ( !request_manager_ptr->send_set_usertype(user_id, user_type) ) {
-        show_message(request_manager_ptr->get_last_error());
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Set)) {
-        show_message(QString("Unable to change type of the choosen user\n%1").arg(error_text));
+    if ( !handler_ptr->change_usertype(user_id, user_type) ) {
+        show_message(QString("Unable to change type of the choosen user\n%1").arg(handler_ptr->get_error()));
         unlock_buttons();
         return;
     }
@@ -246,15 +239,8 @@ void AdminWindow::change_password()
     lock_buttons();
 
     // Отправляем запрос на изменение пароля пользователя.
-    if ( !request_manager_ptr->send_set_password(user_id, pass_value_1) ) {
-        show_message(request_manager_ptr->get_last_error());
-        unlock_buttons();
-        return;
-    }
-
-    // Контроль выполнения запроса.
-    if ( !handler_ptr->handle_request(CommandType::Set)) {
-        show_message(QString("Unable to change password for the choosen user\n%1").arg(error_text));
+    if ( !handler_ptr->set_password(user_id, pass_value_1) ) {
+        show_message(QString("Unable to change password for the choosen user\n%1").arg(handler_ptr->get_error()));
         unlock_buttons();
         return;
     }
