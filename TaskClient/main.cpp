@@ -40,20 +40,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Запрос типов пользователей.
-    if ( !handler_ptr->get_user_types()) {
-        message_window_ptr->set_message(QString("Unable to get user types\n%1").arg(handler_ptr->get_error()));
-        message_window_ptr->exec();
-        return 1;
-    }
-
-    // Запрос возможных статусов задач.
-    if ( !handler_ptr->get_task_statuses()) {
-        message_window_ptr->set_message(QString("Unable to get task statuses\n%1").arg(handler_ptr->get_error()));
-        message_window_ptr->exec();
-        return 1;
-    }
-
     /// Логин на сервере.
     QString user_name;
     QString password;
@@ -84,6 +70,20 @@ int main(int argc, char *argv[])
         // Показываем сообщение о неудачном логине.
         message_window_ptr->set_message(QString("Unable to login on server\n%1").arg(handler_ptr->get_error()));
         message_window_ptr->exec();
+    }
+
+    // Запрос типов пользователей.
+    if ( !handler_ptr->get_user_types()) {
+        message_window_ptr->set_message(QString("Unable to get user types\n%1").arg(handler_ptr->get_error()));
+        message_window_ptr->exec();
+        return 1;
+    }
+
+    // Запрос возможных статусов задач.
+    if ( !handler_ptr->get_task_statuses()) {
+        message_window_ptr->set_message(QString("Unable to get task statuses\n%1").arg(handler_ptr->get_error()));
+        message_window_ptr->exec();
+        return 1;
     }
 
     // В окне для логина и пароля меняем надписи для дальнейшего использования окна для смены пароля.

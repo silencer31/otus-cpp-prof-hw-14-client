@@ -118,6 +118,12 @@ OperatorWindow::OperatorWindow(const req_mngr_shared rm_ptr, const collector_sha
     ui->leOwnId->setText(QString::number(own_id));
     ui->leOwnLogin->setText(own_name);
 
+    // Запрос ФИО.
+    if (handler_ptr->get_fullname(own_id)) {
+        const Fullname fn = collector_ptr->get_fullname();
+        ui->leOwnFullname->setText(QString("%1 %2 %3").arg(fn.second, fn.first, fn.patronymic));
+    }
+
     ui->rbAllTasks->setChecked(true);
 }
 
