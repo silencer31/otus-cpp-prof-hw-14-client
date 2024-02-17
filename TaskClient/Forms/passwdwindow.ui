@@ -63,6 +63,9 @@
      <pointsize>12</pointsize>
     </font>
    </property>
+   <property name="text">
+    <string>127.0.0.1</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="leSecond">
    <property name="geometry">
@@ -95,6 +98,9 @@
     <font>
      <pointsize>12</pointsize>
     </font>
+   </property>
+   <property name="text">
+    <string>2019</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pbOk">
@@ -202,7 +208,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Login</string>
+    <string>Server IP address</string>
    </property>
   </widget>
   <widget class="QLabel" name="labelSecond">
@@ -238,7 +244,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Password</string>
+    <string>Port number</string>
    </property>
   </widget>
  </widget>

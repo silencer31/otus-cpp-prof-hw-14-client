@@ -22,7 +22,11 @@ public:
 
     void clear_fields();
 
-    void change_labels();
+    void set_labels_server_port();
+
+    void set_labels_ask_login();
+
+    void set_labels_new_password();
 
 private:
     Ui::PasswdWindow *ui;

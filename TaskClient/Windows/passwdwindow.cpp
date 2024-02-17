@@ -32,7 +32,19 @@ void PasswdWindow::clear_fields()
     ui->leSecond->clear();
 }
 
-void PasswdWindow::change_labels()
+void PasswdWindow::set_labels_server_port()
+{
+    ui->labelFirst->setText(QString("Login"));
+    ui->labelSecond->setText(QString("Password"));
+}
+
+void PasswdWindow::set_labels_ask_login()
+{
+    ui->labelFirst->setText(QString("Login"));
+    ui->labelSecond->setText(QString("Password"));
+}
+
+void PasswdWindow::set_labels_new_password()
 {
     ui->labelFirst->setText(QString("New password"));
     ui->labelSecond->setText(QString("Repeat password"));

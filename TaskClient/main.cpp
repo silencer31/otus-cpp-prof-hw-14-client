@@ -4,15 +4,68 @@
 
 #include <QApplication>
 
+// Функция проверяет, что введён корректный ip адрес.
+bool check_address(const QString& address_value)
+{
+    const QStringList tmp_list = address_value.split('.');
+    if (tmp_list.size() != 4) {
+        return false;
+    }
+
+    bool res = false;
+    int part_val = 0;
+
+    foreach (const QString& addr_part, tmp_list) {
+        res = false;
+        part_val = addr_part.toInt(&res);
+
+        if (!res || part_val < 0 || part_val > 255) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// Функция проверяет и возвращает числовое значение номера порта.
+int get_port(const QString& port_value)
+{
+    bool res = false;
+    int port = port_value.toInt(&res);
+
+    return (res ? port : -1); // Если преобразовать не удалось, возвращаем -1.
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    std::string server_addr{"127.0.0.1"};
-    int server_port = 2019;
+    // Окно для показа сообщений.
+    const message_win_shared message_window_ptr(new MessageWindow());
+
+    // Окно для запроса адреса и порта сервера, а далее для логина или смены пароля.
+    const passwd_win_shared passwd_window_ptr(new PasswdWindow());
+
+    // Запрашиваем адрес сервера и номер порта. Если пользователь нажмёт отмену, завершаем программу.
+    if ( passwd_window_ptr->exec() == QDialog::Rejected ) {
+        return 0;
+    }
+
+    const QString address_value = passwd_window_ptr->get_first_value();
+    const QString port_value    = passwd_window_ptr->get_second_value();
+
+    int server_port = get_port(port_value);
+
+    // Проверяем, что данные для связи с сервером введены корректно.
+    if ((server_port < 0) || !check_address(address_value)) {
+        message_window_ptr->set_message(QString("Connection parameters are not correct!\nIP value: %1\nPort value: %2")
+                                            .arg(address_value, port_value));
+        message_window_ptr->exec();
+        return -1;
+    }
 
     // Менеджер запросов к серверу.
-    const req_mngr_shared request_manager_ptr{ std::make_shared<RequestManager>(server_addr, server_port)};
+    const req_mngr_shared request_manager_ptr{ std::make_shared<RequestManager>(address_value.toStdString(), server_port)};
 
     // Собиратель данных - ответов от сервера
     const collector_shared collector_ptr{ std::make_shared<Collector>()};
@@ -26,32 +79,59 @@ int main(int argc, char *argv[])
     // Хранитель полученных данных о пользователях и задачах.
     const data_keeper_shared data_keeper_ptr{ std::make_shared<DataKeeper>()};
 
-    // Окно для показа сообщений.
-    const message_win_shared message_window_ptr(new MessageWindow());
-
-    // Окно для входа в систему.
-    const passwd_win_shared passwd_window_ptr(new PasswdWindow());
-
     // Проверка, удалось ли подключиться к серверу.
     if ( !request_manager_ptr->connected_to_server()) {
         message_window_ptr->set_message(QString("Unable to connect to server\n%1")
-                                        .arg(request_manager_ptr->get_last_error()));
+                                            .arg(request_manager_ptr->get_last_error()));
         message_window_ptr->exec();
-        return 1;
+        return -1;
     }
 
-    /// Логин на сервере.
-    QString user_name;
-    QString password;
+    // Запрос типов пользователей.
+    if ( !handler_ptr->get_user_types()) {
+        message_window_ptr->set_message(QString("Unable to get user types\n%1").arg(handler_ptr->get_error()));
+        message_window_ptr->exec();
+        return -1;
+    }
 
+    // Запрос возможных статусов задач.
+    if ( !handler_ptr->get_task_statuses()) {
+        message_window_ptr->set_message(QString("Unable to get task statuses\n%1").arg(handler_ptr->get_error()));
+        message_window_ptr->exec();
+        return -1;
+    }
+
+
+    /// Создаём главные окна программы.
+    // Окно для задач администратора.
+    const admin_win_unique admin_window_ptr(new AdminWindow(request_manager_ptr, collector_ptr, parser_ptr,
+                                                            handler_ptr, data_keeper_ptr,
+                                                            message_window_ptr, passwd_window_ptr));
+
+    // Окно для задач оператора базы данных.
+    const operator_win_unique operator_window_ptr(new OperatorWindow(request_manager_ptr, collector_ptr, parser_ptr,
+                                                                     handler_ptr, data_keeper_ptr,
+                                                                     message_window_ptr, passwd_window_ptr));
+
+    // Окно для задач обычного пользователя.
+    const user_win_unique user_window_ptr(new UserWindow(request_manager_ptr, collector_ptr, parser_ptr,
+                                                         handler_ptr, data_keeper_ptr,
+                                                         message_window_ptr, passwd_window_ptr));
+
+
+    /// Пользователь пытается получить доступ и приступить к работе.
+    // Данный цикл позволяет совершить логин на сервере и переключать работу под разными типами пользователей.
     for(;;) {
+        // Устанавливаем надписи для возможности логина.
+        passwd_window_ptr->set_labels_ask_login();
+
         // Если пользователь нажмёт отмену при логине, завершаем программу.
         if ( passwd_window_ptr->exec() == QDialog::Rejected ) {
             return 0;
         }
 
-        user_name = passwd_window_ptr->get_first_value();
-        password  = passwd_window_ptr->get_second_value();
+        const QString user_name = passwd_window_ptr->get_first_value();
+        const QString password  = passwd_window_ptr->get_second_value();
 
         // Оба поля должны быть заполнены.
         if (user_name.isEmpty() || password.isEmpty()) {
@@ -63,70 +143,48 @@ int main(int argc, char *argv[])
         passwd_window_ptr->clear_fields();
 
         // Пробуем выполнить логин на сервере.
-        if (handler_ptr->login_on_server(user_name, password)) {
-            break;
+        if ( !handler_ptr->login_on_server(user_name, password)) {
+            // Показываем сообщение о неудачном логине.
+            message_window_ptr->set_message(QString("Unable to login on server\n%1").arg(handler_ptr->get_error()));
+            message_window_ptr->exec();
+            continue;
         }
 
-        // Показываем сообщение о неудачном логине.
-        message_window_ptr->set_message(QString("Unable to login on server\n%1").arg(handler_ptr->get_error()));
-        message_window_ptr->exec();
-    }
+        // Т.к. логин был совершен удачно, меняем надписи для возможности смены пароля.
+        passwd_window_ptr->set_labels_new_password();
 
-    // Запрос типов пользователей.
-    if ( !handler_ptr->get_user_types()) {
-        message_window_ptr->set_message(QString("Unable to get user types\n%1").arg(handler_ptr->get_error()));
-        message_window_ptr->exec();
-        return 1;
-    }
+        // Запоминаем актуальные данные текущего пользователя.
+        data_keeper_ptr->set_own_login(user_name);
+        data_keeper_ptr->set_own_id(collector_ptr->get_user_id_after_login());
+        data_keeper_ptr->set_own_type(collector_ptr->get_user_type_after_login());
 
-    // Запрос возможных статусов задач.
-    if ( !handler_ptr->get_task_statuses()) {
-        message_window_ptr->set_message(QString("Unable to get task statuses\n%1").arg(handler_ptr->get_error()));
-        message_window_ptr->exec();
-        return 1;
-    }
+        UserType user_type{UserType::Unsupported};
+        user_type = static_cast<UserType>(data_keeper_ptr->get_own_type());
 
-    // В окне для логина и пароля меняем надписи для дальнейшего использования окна для смены пароля.
-    passwd_window_ptr->change_labels();
-
-    // Окно для задач администратора.
-    const admin_win_unique admin_window_ptr(new AdminWindow(request_manager_ptr, collector_ptr, parser_ptr,
-                                                            handler_ptr, data_keeper_ptr,
-                                                            message_window_ptr, passwd_window_ptr, user_name));
-
-    // Окно для задач оператора базы данных.
-    const operator_win_unique operator_window_ptr(new OperatorWindow(request_manager_ptr, collector_ptr, parser_ptr,
-                                                                     handler_ptr, data_keeper_ptr,
-                                                                     message_window_ptr, passwd_window_ptr, user_name));
-
-    // Окно для задач обычного пользователя.
-    const user_win_unique user_window_ptr(new UserWindow(request_manager_ptr, collector_ptr, parser_ptr,
-                                                         handler_ptr, data_keeper_ptr,
-                                                         message_window_ptr, passwd_window_ptr, user_name));
-
-    UserType user_type{UserType::Unsupported};
-    user_type = static_cast<UserType>(collector_ptr->get_own_type());
-
-    switch(user_type) {
-    case UserType::Unsupported:
-        message_window_ptr->set_message(QString("Unsupported user type: %1")
-                                        .arg(QString::number(collector_ptr->get_own_type())));
-        message_window_ptr->exec();
-        return 1;
-    case UserType::Administrator:
-        admin_window_ptr->show();
-        break;
-    case UserType::Operator:
-        operator_window_ptr->show();
-        break;
-    case UserType::User:
-        user_window_ptr->show();
-        break;
-    default:
-        message_window_ptr->set_message(QString("Unsupported user type: %1")
-                                        .arg(QString::number(collector_ptr->get_own_type())));
-        message_window_ptr->exec();
-        return 1;
+        switch(user_type) {
+        case UserType::Unsupported:
+            message_window_ptr->set_message(QString("Unsupported user type: %1")
+                                            .arg(QString::number(data_keeper_ptr->get_own_type())));
+            message_window_ptr->exec();
+            return 1;
+        case UserType::Administrator:
+            admin_window_ptr->output_user_data();
+            admin_window_ptr->show();
+            break;
+        case UserType::Operator:
+            operator_window_ptr->output_user_data();
+            operator_window_ptr->show();
+            break;
+        case UserType::User:
+            user_window_ptr->output_user_data();
+            user_window_ptr->show();
+            break;
+        default:
+            message_window_ptr->set_message(QString("Unsupported user type: %1")
+                                            .arg(QString::number(data_keeper_ptr->get_own_type())));
+            message_window_ptr->exec();
+            return 1;
+        }
     }
 
     return a.exec();

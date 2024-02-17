@@ -23,14 +23,14 @@ void UserWindow::create_task()
     lock_buttons();
 
     // Отправляем запрос на создание новой задачи.
-    if ( !handler_ptr->create_task(own_id, deadline, task_name, description) ) {
+    if ( !handler_ptr->create_task( data_keeper_ptr->get_own_id(), deadline, task_name, description) ) {
         show_message(QString("Unable to add new task\n%1").arg(handler_ptr->get_error()));
         unlock_buttons();
         return;
     }
 
     // Добавляем новую задачу в коллекцию данных задач.
-    const TaskData task_data{own_id, 2, deadline, task_name, description};
+    const TaskData task_data{data_keeper_ptr->get_own_id(), 2, deadline, task_name, description};
     const int new_id = collector_ptr->get_item_id();
 
     data_keeper_ptr->add_task(new_id, task_data);
@@ -45,8 +45,8 @@ void UserWindow::create_task()
     tasks_table_model->setData(tasks_table_model->index(row_number, 2), task_name, Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(row_number, 3), deadline, Qt::DisplayRole);
     tasks_table_model->setData(tasks_table_model->index(row_number, 4), description, Qt::DisplayRole);
-    tasks_table_model->setData(tasks_table_model->index(row_number, 5), QString::number(own_id), Qt::DisplayRole);
-    tasks_table_model->setData(tasks_table_model->index(row_number, 6), own_name, Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(row_number, 5), QString::number(data_keeper_ptr->get_own_id()), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(row_number, 6), data_keeper_ptr->get_own_login(), Qt::DisplayRole);
 
     show_message(QString("Task %1\nhas been successfully created").arg(task_name));
 
@@ -79,7 +79,7 @@ void UserWindow::take_task()
     }
 
     // Проверяем, назначена ли уже выбранная задача на текущего пользователя.
-    if (user_id == own_id) {
+    if (user_id == data_keeper_ptr->get_own_id()) {
         show_message(QString("This task is already appoited to you"));
         return;
     }
@@ -89,7 +89,7 @@ void UserWindow::take_task()
     lock_buttons();
 
     // Устанавливаем себя как исполнителя задачи.
-    if ( !handler_ptr->appoint_task_user(task_id, own_id) ) {
+    if ( !handler_ptr->appoint_task_user(task_id, data_keeper_ptr->get_own_id()) ) {
         show_message(QString("Unable to take task\n%1\n%2")
                          .arg(task_to_take, handler_ptr->get_error()));
         unlock_buttons();
@@ -97,7 +97,7 @@ void UserWindow::take_task()
     }
 
     // Запоминаем новое значение user_id исполнителя задачи.
-    data_keeper_ptr->set_task_user(task_id, own_id);
+    data_keeper_ptr->set_task_user(task_id, data_keeper_ptr->get_own_id());
 
     // Проверяем, был ли у задачи статус "not appointed".
     if (data_keeper_ptr->get_task_data(task_id)->status == 1) {
@@ -112,8 +112,8 @@ void UserWindow::take_task()
     }
 
     // Обновляем содержимое ячейки в таблице.
-    tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 5), QString::number(own_id), Qt::DisplayRole);
-    tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 6), own_name, Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 5), QString::number(data_keeper_ptr->get_own_id()), Qt::DisplayRole);
+    tasks_table_model->setData(tasks_table_model->index(selection.at(0).row(), 6), data_keeper_ptr->get_own_login(), Qt::DisplayRole);
 
     show_message(QString("Task %1\nhas been successfully taken").arg(task_to_take));
 
@@ -146,7 +146,7 @@ void UserWindow::change_task_status()
     }
 
     // Пользователь может изменять статус только одной из своих задач.
-    if (user_id != own_id) {
+    if (user_id != data_keeper_ptr->get_own_id()) {
         show_message(QString("Take task before changing status"));
         return;
     }
@@ -218,7 +218,7 @@ void UserWindow::set_task_deadline()
     }
 
     // Пользователь может изменять deadline только одной из своих задач.
-    if (user_id != own_id) {
+    if (user_id != data_keeper_ptr->get_own_id()) {
         show_message(QString("Take task before changing deadline"));
         return;
     }

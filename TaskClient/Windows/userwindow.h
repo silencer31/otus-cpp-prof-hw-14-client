@@ -24,9 +24,11 @@ public:
     explicit UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr_ptr, const parser_shared par_ptr,
                         const handler_shared hdlr_ptr, const data_keeper_shared dk_ptr,
                         const message_win_shared mw_ptr, const passwd_win_shared pwd_ptr,
-                        const QString& uname, QWidget *parent = nullptr);
+                        QWidget *parent = nullptr);
 
     ~UserWindow();
+
+    void output_user_data(); // Вывести данные текущего пользователя.
 
 private: // methods
     void lock_buttons();
@@ -69,15 +71,9 @@ private: // data
     const message_win_shared message_window_ptr;
     const passwd_win_shared passwd_window_ptr;
 
-    const QString own_name;
-    const int own_id;
-
     QStandardItemModel *tasks_table_model; // Модель для таблицы с данными о задачах.
 
     SimpleItemDelegate *tasks_table_delegate{nullptr}; // Делегат для таблицы.
-
-    std::string server_reply;
-    QString error_text;
 };
 
 using user_win_unique = QScopedPointer<UserWindow>;

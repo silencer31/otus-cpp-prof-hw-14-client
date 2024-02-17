@@ -25,7 +25,7 @@ struct ReplyResult
     QString details;
 };
 
-// Для ответа на запрос логин клиента.
+// Для ответа от сервера на запрос сделать логин в новой сессии не сервере.
 // login
 struct IdType
 {
@@ -33,6 +33,7 @@ struct IdType
     int user_type;
 };
 
+// Чтобы получить от сервера логин и тип пользователя по user_id.
 // get : username
 struct LoginType
 {
@@ -45,6 +46,7 @@ struct LoginType
     int user_type;
 };
 
+// Чтобы получить от сервера ФИО пользователя по user_id.
 // get : fullname
 struct Fullname
 {
@@ -58,6 +60,7 @@ struct Fullname
     QString patronymic; // Отчество.
 };
 
+// Данная структура объединяет в себе логин, тип и ФИО пользователя.
 struct UserData
 {
     UserData() = default;
@@ -72,6 +75,7 @@ struct UserData
     Fullname  fullname;
 };
 
+// Струтура содержит в себе id исполнителя  задачи, статус задачи, срок исполнения, название и описание задачи.
 // get : taskdata
 struct TaskData
 {
@@ -87,6 +91,7 @@ struct TaskData
     QString description;
 };
 
+// Массив предназначен для получения от сервера списка id пользователей или id задач.
 // get : userlist, tasklist
 struct IntArray
 {
@@ -94,6 +99,7 @@ struct IntArray
     QVector<int> id_list;
 };
 
+// Для получения возможных типов пользователя и статусов задач.
 // get : statuslist, typelist
 struct IntStrMap
 {

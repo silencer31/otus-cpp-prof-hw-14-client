@@ -139,10 +139,10 @@ void OperatorWindow::get_users_list()
         }
 
         tasks_table_model->setData(tasks_table_model->index(i, 6),
-                            data_keeper_ptr->users_containes(user_id)
-                            ? (data_keeper_ptr->get_user_data(user_id))->login_type.user_name
-                            : ((user_id == own_id) ? own_name : QString("Unknown")),
-                            Qt::DisplayRole);
+                data_keeper_ptr->users_containes(user_id)
+                ? (data_keeper_ptr->get_user_data(user_id))->login_type.user_name
+                : ((user_id == data_keeper_ptr->get_own_id()) ? data_keeper_ptr->get_own_login() : QString("Unknown")),
+                Qt::DisplayRole);
     }
 
     ui->tvUsers->clearSelection();
@@ -175,7 +175,7 @@ void OperatorWindow::get_tasks_list()
     bool result = (ui->rbChoosen->isChecked()
                     ? handler_ptr->get_taskslist(users_table_model->item(selection.at(0).row())->data().toInt())
                     : ( ui->rbOnlyOwn->isChecked()
-                        ? handler_ptr->get_taskslist(own_id)
+                        ? handler_ptr->get_taskslist(data_keeper_ptr->get_own_id())
                         : handler_ptr->get_taskslist())
                   );
 
@@ -220,10 +220,10 @@ void OperatorWindow::get_tasks_list()
         tasks_table_model->setData(tasks_table_model->index(row_number, 5), QString::number(iter->user_id), Qt::DisplayRole);
 
         tasks_table_model->setData(tasks_table_model->index(row_number, 6),
-                                   data_keeper_ptr->users_containes(iter->user_id)
-                                       ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name
-                                       : ((iter->user_id == own_id) ? own_name : QString("Unknown")),
-                                   Qt::DisplayRole);
+                data_keeper_ptr->users_containes(iter->user_id)
+                ? (data_keeper_ptr->get_user_data(iter->user_id))->login_type.user_name
+                : ((iter->user_id == data_keeper_ptr->get_own_id()) ? data_keeper_ptr->get_own_login() : QString("Unknown")),
+                Qt::DisplayRole);
     }
 
     ui->tvTasks->clearSelection();

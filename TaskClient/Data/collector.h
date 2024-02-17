@@ -52,14 +52,14 @@ public:
     // Очистить предыдущий результат.
     void clear_result();
 
-    /// Логин пользователя на сервере.
-    // Получить id пользователя в базе.
-    int get_own_id() {
+    /// .
+    // Получить id пользователя, полученный после логина на сервере.
+    int get_user_id_after_login() {
         return id_type.user_id;
     }
 
-    // Получить тип пользователя в базе.
-    int get_own_type() {
+    // Получить тип пользователя, полученный после логина на сервере.
+    int get_user_type_after_login() {
         return id_type.user_type;
     }
 

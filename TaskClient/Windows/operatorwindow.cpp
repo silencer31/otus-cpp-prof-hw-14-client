@@ -4,7 +4,7 @@
 OperatorWindow::OperatorWindow(const req_mngr_shared rm_ptr, const collector_shared cltr_ptr, const parser_shared par_ptr,
                                const handler_shared hdlr_ptr, const data_keeper_shared dk_ptr,
                                const message_win_shared mw_ptr, const passwd_win_shared pwd_ptr,
-                               const QString& uname, QWidget *parent)
+                               QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::OperatorWindow)
     , request_manager_ptr(rm_ptr)
@@ -14,8 +14,6 @@ OperatorWindow::OperatorWindow(const req_mngr_shared rm_ptr, const collector_sha
     , data_keeper_ptr(dk_ptr)
     , message_window_ptr(mw_ptr)
     , passwd_window_ptr(pwd_ptr)
-    , own_name(uname)
-    , own_id(collector_ptr->get_own_id())
     , users_table_model(new QStandardItemModel())
     , tasks_table_model(new QStandardItemModel())
     , users_table_delegate(new SimpleItemDelegate(users_table_model))
@@ -115,16 +113,20 @@ OperatorWindow::OperatorWindow(const req_mngr_shared rm_ptr, const collector_sha
         ui->comboTaskStatus->addItem(QString("%1 : %2").arg(QString::number(iter.key()), iter.value()));
     }
 
-    ui->leOwnId->setText(QString::number(own_id));
-    ui->leOwnLogin->setText(own_name);
+    ui->rbAllTasks->setChecked(true);
+}
+
+// Вывести данные текущего пользователя.
+void OperatorWindow::output_user_data()
+{
+    ui->leOwnId->setText(QString::number(data_keeper_ptr->get_own_id()));
+    ui->leOwnLogin->setText(data_keeper_ptr->get_own_login());
 
     // Запрос ФИО.
-    if (handler_ptr->get_fullname(own_id)) {
+    if (handler_ptr->get_fullname(data_keeper_ptr->get_own_id())) {
         const Fullname fn = collector_ptr->get_fullname();
         ui->leOwnFullname->setText(QString("%1 %2 %3").arg(fn.second, fn.first, fn.patronymic));
     }
-
-    ui->rbAllTasks->setChecked(true);
 }
 
 void OperatorWindow::lock_buttons()

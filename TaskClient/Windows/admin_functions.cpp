@@ -93,7 +93,7 @@ void AdminWindow::delete_user()
     }
 
     // Проверяем, нет ли попытки удалить себя.
-    if (user_id == own_id) {
+    if (user_id == data_keeper_ptr->get_own_id()) {
         show_message(QString("You are not able to delete yourself!"));
         return;
     }
@@ -159,7 +159,7 @@ void AdminWindow::change_user_type()
     }
 
     // Проверяем, нет ли попытки изменить свой тип.
-    if (user_id == own_id) {
+    if (user_id == data_keeper_ptr->get_own_id()) {
         show_message(QString("You are not able to change your type!"));
         return;
     }

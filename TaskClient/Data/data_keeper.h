@@ -16,10 +16,39 @@
 class DataKeeper
 {
 public:
-    DataKeeper() = default;
+    DataKeeper() : own_id(0) {}
+
     ~DataKeeper() = default;
 
-    /// Очистка коллекций.
+    /// Собственные данные.
+    // Логин, который ввёл пользователь.
+    void set_own_login(const QString& login) {
+        own_user_data.login_type.user_name = login;
+    }
+
+    const QString& get_own_login() {
+        return own_user_data.login_type.user_name;
+    }
+
+    // id
+    void set_own_id(const int id) {
+        own_id = id;
+    }
+
+    const int& get_own_id() {
+        return own_id;
+    }
+
+    // Тип пользователя.
+    void set_own_type(const int& type) {
+        own_user_data.login_type.user_type = type;
+    }
+
+    const int& get_own_type() {
+        return own_user_data.login_type.user_type;
+    }
+
+    /// Очистка коллекций с данными других пользователей или задач.
     // Очистка всех данных о пользователях.
     void users_clear() {
         users_data.clear();
@@ -147,8 +176,11 @@ public:
     void reset_tasks_status(const int user_id);
 
 private:
-    QMap<int, UserData> users_data;
-    QMap<int, TaskData> tasks_data;
+    int own_id; // Собственный id пользователя.
+    UserData own_user_data; // Собственные данные.
+
+    QMap<int, UserData> users_data; // Коллекция данных пользователей.
+    QMap<int, TaskData> tasks_data; // Коллекция данных задач.
 };
 
 using data_keeper_shared = std::shared_ptr<DataKeeper>;
