@@ -2,39 +2,10 @@
 #include "Windows/operatorwindow.h"
 #include "Windows/userwindow.h"
 
+#include "Extra/extra_functions.h"
+
 #include <QApplication>
 
-// Функция проверяет, что введён корректный ip адрес.
-bool check_address(const QString& address_value)
-{
-    const QStringList tmp_list = address_value.split('.');
-    if (tmp_list.size() != 4) {
-        return false;
-    }
-
-    bool res = false;
-    int part_val = 0;
-
-    foreach (const QString& addr_part, tmp_list) {
-        res = false;
-        part_val = addr_part.toInt(&res);
-
-        if (!res || part_val < 0 || part_val > 255) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-// Функция проверяет и возвращает числовое значение номера порта.
-int get_port(const QString& port_value)
-{
-    bool res = false;
-    int port = port_value.toInt(&res);
-
-    return (res ? port : -1); // Если преобразовать не удалось, возвращаем -1.
-}
 
 int main(int argc, char *argv[])
 {
@@ -46,26 +17,34 @@ int main(int argc, char *argv[])
     // Окно для запроса адреса и порта сервера, а далее для логина или смены пароля.
     const passwd_win_shared passwd_window_ptr(new PasswdWindow());
 
-    // Запрашиваем адрес сервера и номер порта. Если пользователь нажмёт отмену, завершаем программу.
-    if ( passwd_window_ptr->exec() == QDialog::Rejected ) {
-        return 0;
-    }
+    int server_port{2019};
+    std::string server_ip{"127.0.0.1"};
 
-    const QString address_value = passwd_window_ptr->get_first_value();
-    const QString port_value    = passwd_window_ptr->get_second_value();
+    // Зарашиваем ip адрес сервера и номер порта.
+    for(;;) {
+        // Запрашиваем адрес сервера и номер порта. Если пользователь нажмёт отмену, завершаем программу.
+        if ( passwd_window_ptr->exec() == QDialog::Rejected ) {
+            return 0;
+        }
 
-    int server_port = get_port(port_value);
+        const QString address_value = passwd_window_ptr->get_first_value();
+        const QString port_value    = passwd_window_ptr->get_second_value();
 
-    // Проверяем, что данные для связи с сервером введены корректно.
-    if ((server_port < 0) || !check_address(address_value)) {
-        message_window_ptr->set_message(QString("Connection parameters are not correct!\nIP value: %1\nPort value: %2")
+        server_port = get_port(port_value);
+
+        // Проверяем, что данные для связи с сервером введены корректно.
+        if ((server_port < 0) || !check_address(address_value)) {
+            message_window_ptr->set_message(QString("Connection parameters are not correct!\nIP value: %1\nPort value: %2")
                                             .arg(address_value, port_value));
-        message_window_ptr->exec();
-        return -1;
+            message_window_ptr->exec();
+            return -1;
+        }
+
+        server_ip = address_value.toStdString();
     }
 
     // Менеджер запросов к серверу.
-    const req_mngr_shared request_manager_ptr{ std::make_shared<RequestManager>(address_value.toStdString(), server_port)};
+    const req_mngr_shared request_manager_ptr{ std::make_shared<RequestManager>(server_ip, server_port)};
 
     // Собиратель данных - ответов от сервера
     const collector_shared collector_ptr{ std::make_shared<Collector>()};

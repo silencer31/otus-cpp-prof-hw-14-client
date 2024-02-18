@@ -30,6 +30,8 @@ public:
 
     bool handle_reply(CommandType command, const std::string& reply);
 
+    bool parse_common_request(const QJsonObject& reply_object);
+
     bool parse_login_request(const QJsonObject& reply_object);
 
     bool parse_add_request(const QJsonObject& reply_object);

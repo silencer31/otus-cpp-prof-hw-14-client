@@ -43,19 +43,6 @@ bool Handler::test_request()
     return handle_request(CommandType::Test);
 }
 
-// Выключить сервер.
-bool Handler::shutdown_server()
-{
-    // Отправляем запрос на сервер.
-    if ( !request_manager_ptr->send_shutdown()) {
-        error_text = QString("Unable to send shutdown reques\n%1").arg(request_manager_ptr->get_last_error());
-        return false;
-    }
-
-    // Контроль выполнения запроса.
-    return handle_request(CommandType::Shutdown);
-}
-
 // Запрос возможных типов пользователей.
 bool Handler::get_user_types()
 {
@@ -65,13 +52,13 @@ bool Handler::get_user_types()
     }
 
     // Запрос списка типов пользователей.
-    if (!request_manager_ptr->send_get_typelist()) {
+    if (!request_manager_ptr->send_get_user_types()) {
         error_text = QString("Send request error: %1").arg(request_manager_ptr->get_last_error());
         return false;
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
+    if ( !handle_request(CommandType::Common)) {
         return false;
     }
 
@@ -93,13 +80,13 @@ bool Handler::get_task_statuses()
     }
 
     // Запрос списка статусов задач.
-    if (!request_manager_ptr->send_get_statuslist()) {
+    if (!request_manager_ptr->send_get_task_statuses()) {
         error_text = QString("Send request error: %1").arg(request_manager_ptr->get_last_error());
         return false;
     }
 
     // Контроль выполнения запроса.
-    if ( !handle_request(CommandType::Get)) {
+    if ( !handle_request(CommandType::Common)) {
         return false;
     }
 
@@ -110,6 +97,19 @@ bool Handler::get_task_statuses()
     }
 
     return true;
+}
+
+// Выключить сервер.
+bool Handler::shutdown_server()
+{
+    // Отправляем запрос на сервер.
+    if ( !request_manager_ptr->send_shutdown()) {
+        error_text = QString("Unable to send shutdown reques\n%1").arg(request_manager_ptr->get_last_error());
+        return false;
+    }
+
+    // Контроль выполнения запроса.
+    return handle_request(CommandType::Shutdown);
 }
 
 // Логин пользователя на сервере.

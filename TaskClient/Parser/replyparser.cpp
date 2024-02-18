@@ -94,6 +94,12 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
             return false;
         }
         return true;
+    case CommandType::Common:
+        if (reply_object["command"] != "common") {
+            last_error = QString("Command type is not common");
+            return false;
+        }
+        return (request_result ? parse_common_request(reply_object) : true);
     case CommandType::Login:
         if (reply_object["command"] != "login") {
             last_error = QString("Command type is not login");
@@ -140,6 +146,26 @@ bool ReplyParser::handle_reply(CommandType command, const std::string& reply)
         last_error = QString("Bad command type");
         return false;
     }
+
+    return false;
+}
+
+bool ReplyParser::parse_common_request(const QJsonObject& reply_object)
+{
+    if ( !reply_object.contains("type")) {
+        last_error = QString("Field type not found in common request");
+        return false;
+    }
+
+    if (reply_object["type"] == "usertypes") {
+        return parse_get_types(reply_object);
+    }
+
+    if (reply_object["type"] == "taskstatuses") {
+        return parse_get_statuses(reply_object);
+    }
+
+    last_error = QString("Unknown get request type");
 
     return false;
 }
@@ -198,14 +224,6 @@ bool ReplyParser::parse_get_request(const QJsonObject& reply_object)
 
     if (reply_object["type"] == "tasklist") {
         return parse_get_task_ids(reply_object);
-    }
-
-    if (reply_object["type"] == "typelist") {
-        return parse_get_types(reply_object);
-    }
-
-    if (reply_object["type"] == "statuslist") {
-        return parse_get_statuses(reply_object);
     }
 
     if (reply_object["type"] == "taskdata") {

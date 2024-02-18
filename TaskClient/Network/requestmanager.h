@@ -45,6 +45,10 @@ public:
 
     bool send_test_request();
 
+    bool send_get_user_types(); // Получить список возможных типов пользователя и список с их описанием.
+
+    bool send_get_task_statuses(); // Получить список возможных статусов задачи и список с их описанием.
+
     bool send_login(const QString& user_name, const QString& password);
 
     bool send_closedown();
@@ -58,10 +62,6 @@ public:
     bool send_get_userlist(); // Получить список всех id пользователей.
 
     bool send_get_tasklist(const int id = -1); // Если указан user_id, получить список его задач, а если не указан, то список всех задач.
-
-    bool send_get_typelist(); // Получить список возможных типов пользователя и список с их описанием.
-
-    bool send_get_statuslist(); // Получить список возможных статусов задачи и список с их описанием.
 
     bool send_get_taskdata(const int id); // Получить данные задачи по task id.
 
