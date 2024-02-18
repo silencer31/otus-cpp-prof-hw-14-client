@@ -30,6 +30,13 @@ bool NetCommunication::connect_to_server()
     return true;
 }
 
+// Подключиться снова.
+bool NetCommunication::reconnect()
+{
+    connected = connect_to_server();
+    return connected;
+}
+
 // Отключиться
 void NetCommunication::disconnect()
 {

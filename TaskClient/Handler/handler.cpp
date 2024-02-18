@@ -99,6 +99,28 @@ bool Handler::get_task_statuses()
     return true;
 }
 
+// Завершить текущую сессию.
+bool Handler::closedown_session()
+{
+    if ( !request_manager_ptr->connected_to_server()) {
+        return true;
+    }
+
+    if ( !request_manager_ptr->send_closedown()) {
+        error_text = QString("Unable to send shutdown reques\n%1").arg(request_manager_ptr->get_last_error());
+        return false;
+    }
+
+    // Контроль выполнения запроса.
+    if ( !handle_request(CommandType::Closedown)) {
+        return false;
+    }
+
+    request_manager_ptr->disconnect_from_server();
+
+    return true;
+}
+
 // Выключить сервер.
 bool Handler::shutdown_server()
 {

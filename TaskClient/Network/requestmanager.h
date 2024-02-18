@@ -25,6 +25,10 @@ public:
         , current_request(CommandType::Unknown)
     {}
 
+    bool reconnect_to_server() {
+        return (net_communication_ptr->is_connected() ? true : net_communication_ptr->reconnect());
+    }
+
     bool connected_to_server() const {
         return net_communication_ptr->is_connected();
     }

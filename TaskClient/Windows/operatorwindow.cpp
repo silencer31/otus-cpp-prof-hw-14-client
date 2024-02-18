@@ -116,6 +116,12 @@ OperatorWindow::OperatorWindow(const req_mngr_shared rm_ptr, const collector_sha
     ui->rbAllTasks->setChecked(true);
 }
 
+// Обработка события закрытия окна.
+void OperatorWindow::closeEvent(QCloseEvent*)
+{
+    emit closed();
+}
+
 // Вывести данные текущего пользователя.
 void OperatorWindow::output_user_data()
 {

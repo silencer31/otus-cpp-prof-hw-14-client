@@ -73,6 +73,12 @@ UserWindow::UserWindow(const req_mngr_shared rm_ptr, const collector_shared cltr
     }
 }
 
+// Обработка события закрытия окна.
+void UserWindow::closeEvent(QCloseEvent*)
+{
+    emit closed();
+}
+
 // Вывести данные текущего пользователя.
 void UserWindow::output_user_data()
 {

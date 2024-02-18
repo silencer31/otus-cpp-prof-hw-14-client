@@ -5,7 +5,7 @@
 #include "Extra/extra_functions.h"
 
 #include <QApplication>
-
+#include <QObject>
 
 int main(int argc, char *argv[])
 {
@@ -37,10 +37,11 @@ int main(int argc, char *argv[])
             message_window_ptr->set_message(QString("Connection parameters are not correct!\nIP value: %1\nPort value: %2")
                                             .arg(address_value, port_value));
             message_window_ptr->exec();
-            return -1;
+            continue;
         }
 
         server_ip = address_value.toStdString();
+        break;
     }
 
     // Менеджер запросов к серверу.
@@ -98,15 +99,24 @@ int main(int argc, char *argv[])
                                                          message_window_ptr, passwd_window_ptr));
 
 
+    // Устанавливаем надписи для возможности логина.
+    passwd_window_ptr->set_labels_ask_login();
+
     /// Пользователь пытается получить доступ и приступить к работе.
     // Данный цикл позволяет совершить логин на сервере и переключать работу под разными типами пользователей.
     for(;;) {
-        // Устанавливаем надписи для возможности логина.
-        passwd_window_ptr->set_labels_ask_login();
+        passwd_window_ptr->clear_fields();
 
         // Если пользователь нажмёт отмену при логине, завершаем программу.
         if ( passwd_window_ptr->exec() == QDialog::Rejected ) {
             return 0;
+        }
+
+        // Либо уже подключено, либо пробуем подключиться к серверу.
+        if ( !request_manager_ptr->reconnect_to_server()) {
+            message_window_ptr->set_message(QString("Unable to connect to server\n%1")
+                                                .arg(request_manager_ptr->get_last_error()));
+            message_window_ptr->exec();
         }
 
         const QString user_name = passwd_window_ptr->get_first_value();
@@ -119,7 +129,6 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        passwd_window_ptr->clear_fields();
 
         // Пробуем выполнить логин на сервере.
         if ( !handler_ptr->login_on_server(user_name, password)) {
@@ -140,21 +149,26 @@ int main(int argc, char *argv[])
         UserType user_type{UserType::Unsupported};
         user_type = static_cast<UserType>(data_keeper_ptr->get_own_type());
 
+        QEventLoop loop;
+
         switch(user_type) {
         case UserType::Unsupported:
             message_window_ptr->set_message(QString("Unsupported user type: %1")
                                             .arg(QString::number(data_keeper_ptr->get_own_type())));
             message_window_ptr->exec();
-            return 1;
+            return -1;
         case UserType::Administrator:
+            QObject::connect(admin_window_ptr.data(), SIGNAL(closed()), &loop, SLOT(quit()));
             admin_window_ptr->output_user_data();
             admin_window_ptr->show();
             break;
         case UserType::Operator:
+            QObject::connect(operator_window_ptr.data(), SIGNAL(closed()), &loop, SLOT(quit()));
             operator_window_ptr->output_user_data();
             operator_window_ptr->show();
             break;
         case UserType::User:
+            QObject::connect(user_window_ptr.data(), SIGNAL(closed()), &loop, SLOT(quit()));
             user_window_ptr->output_user_data();
             user_window_ptr->show();
             break;
@@ -162,8 +176,21 @@ int main(int argc, char *argv[])
             message_window_ptr->set_message(QString("Unsupported user type: %1")
                                             .arg(QString::number(data_keeper_ptr->get_own_type())));
             message_window_ptr->exec();
-            return 1;
+            return -1;
         }
+
+        loop.exec();
+
+        // Завершаем сессию, из которой вышел пользователь. Если соединение с сервером уже закрыто, ошибки не будет.
+        if ( !handler_ptr->closedown_session()) {
+            message_window_ptr->set_message(QString("Unable to close down current session!\n%1")
+                                            .arg(handler_ptr->get_error()));
+            message_window_ptr->exec();
+            return -1;
+        }
+
+         // Устанавливаем надписи для возможности логина.
+        passwd_window_ptr->set_labels_ask_login();
     }
 
     return a.exec();

@@ -32,6 +32,12 @@ public:
 
     void output_user_data(); // Вывести данные текущего пользователя.
 
+signals:
+    void closed();
+
+protected:
+    void closeEvent(QCloseEvent*);
+
 private: // methods
     void lock_buttons();
 

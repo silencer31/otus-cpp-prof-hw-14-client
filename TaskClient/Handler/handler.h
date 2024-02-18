@@ -37,6 +37,9 @@ public:
     // Тестовый запрос серверу.
     bool test_request();
 
+    // Завершить текущую сессию.
+    bool closedown_session();
+
     // Выключить сервер.
     bool shutdown_server();
 

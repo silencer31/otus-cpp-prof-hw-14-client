@@ -26,6 +26,9 @@ public:
     // Подключаемся к серверу.
     bool connect_to_server();
 
+    // Подключиться снова.
+    bool reconnect();
+
     // Отключиться
     void disconnect();
 

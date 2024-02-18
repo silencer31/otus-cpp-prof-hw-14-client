@@ -34,8 +34,8 @@ void PasswdWindow::clear_fields()
 
 void PasswdWindow::set_labels_server_port()
 {
-    ui->labelFirst->setText(QString("Login"));
-    ui->labelSecond->setText(QString("Password"));
+    ui->labelFirst->setText(QString("Server IP address"));
+    ui->labelSecond->setText(QString("Server port"));
 }
 
 void PasswdWindow::set_labels_ask_login()

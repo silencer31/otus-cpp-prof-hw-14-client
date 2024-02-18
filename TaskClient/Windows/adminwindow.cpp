@@ -117,6 +117,12 @@ AdminWindow::AdminWindow(const req_mngr_shared rm_ptr, const collector_shared cl
     ui->pbClear->setEnabled(false);    
 }
 
+// Обработка события закрытия окна.
+void AdminWindow::closeEvent(QCloseEvent*)
+{
+    emit closed();
+}
+
 // Вывести данные текущего пользователя.
 void AdminWindow::output_user_data()
 {
