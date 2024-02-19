@@ -149,6 +149,12 @@ void UserWindow::get_tasks_list()
 // Создать новую или изменить данные выбранной задачи.
 void UserWindow::add_or_edit_task()
 {
+    // Есть ли связь с сервером.
+    if (!request_manager_ptr->connected_to_server()) {
+        show_message(QString("No connection with server!"));
+        return;
+    }
+
     // Создать новую задачу.
     if (ui->rbCreateTask->isChecked()) {
         create_task();

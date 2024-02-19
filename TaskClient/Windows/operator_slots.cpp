@@ -161,19 +161,18 @@ void OperatorWindow::get_tasks_list()
         }
     }
 
-    // Блокируем кнопки
-    lock_buttons();
-
     // Есть ли связь с сервером.
     if (!request_manager_ptr->connected_to_server()) {
         show_message(QString("No connection with server!"));
-        unlock_buttons();
         return;
     }
 
+    // Блокируем кнопки
+    lock_buttons();
+//->data(Qt::DisplayRole).toInt(&ok)
     // Запрос списка id задач.
     bool result = (ui->rbChoosen->isChecked()
-                    ? handler_ptr->get_taskslist(users_table_model->item(selection.at(0).row())->data().toInt())
+                    ? handler_ptr->get_taskslist(users_table_model->item(selection.at(0).row(), 0)->data(Qt::DisplayRole).toInt())
                     : ( ui->rbOnlyOwn->isChecked()
                         ? handler_ptr->get_taskslist(data_keeper_ptr->get_own_id())
                         : handler_ptr->get_taskslist())
@@ -233,6 +232,12 @@ void OperatorWindow::get_tasks_list()
 // Создать новую или изменить данные выбранной задачи.
 void OperatorWindow::add_or_edit_task()
 {
+    // Есть ли связь с сервером.
+    if (!request_manager_ptr->connected_to_server()) {
+        show_message(QString("No connection with server!"));
+        return;
+    }
+
     // Создать новую задачу.
     if (ui->rbCreateTask->isChecked()) {
         create_task();

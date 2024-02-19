@@ -117,6 +117,8 @@ int main(int argc, char *argv[])
             message_window_ptr->set_message(QString("Unable to connect to server\n%1")
                                                 .arg(request_manager_ptr->get_last_error()));
             message_window_ptr->exec();
+
+            continue;
         }
 
         const QString user_name = passwd_window_ptr->get_first_value();

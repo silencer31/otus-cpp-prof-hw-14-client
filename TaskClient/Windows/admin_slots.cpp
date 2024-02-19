@@ -216,6 +216,12 @@ void AdminWindow::get_tasks_list()
 // Создать нового или изменить данные выбранного пользователя.
 void AdminWindow::add_or_edit_user()
 {
+    // Есть ли связь с сервером.
+    if (!request_manager_ptr->connected_to_server()) {
+        show_message(QString("No connection with server!"));
+        return;
+    }
+
     // Создать нового пользователя.
     if (ui->rbCreateUser->isChecked()) {
         create_user();
