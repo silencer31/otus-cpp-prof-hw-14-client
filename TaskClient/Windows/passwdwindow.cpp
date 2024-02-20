@@ -10,8 +10,11 @@ PasswdWindow::PasswdWindow(QWidget *parent)
     // Убирает верхний хэдер окна.
     setWindowFlags(Qt::WindowTitleHint | Qt::ToolTip);
 
+    // Кнопки
     connect(ui->pbOk,     SIGNAL(clicked(bool)),   this, SLOT(accept()) );
     connect(ui->pbCancel, SIGNAL(clicked(bool)),   this, SLOT(reject()) );
+
+    // Поля ввода
     connect(ui->leFirst,  SIGNAL(returnPressed()), this, SLOT(accept()) );
     connect(ui->leSecond, SIGNAL(returnPressed()), this, SLOT(accept()) );
 }
@@ -36,18 +39,21 @@ void PasswdWindow::set_labels_server_port()
 {
     ui->labelFirst->setText(QString("Server IP address"));
     ui->labelSecond->setText(QString("Server port"));
+    ui->pbCancel->setText(QString("Exit"));
 }
 
 void PasswdWindow::set_labels_ask_login()
 {
     ui->labelFirst->setText(QString("Login"));
     ui->labelSecond->setText(QString("Password"));
+    ui->pbCancel->setText(QString("Exit"));
 }
 
 void PasswdWindow::set_labels_new_password()
 {
     ui->labelFirst->setText(QString("New password"));
     ui->labelSecond->setText(QString("Repeat password"));
+    ui->pbCancel->setText(QString("Cancel"));
 }
 
 PasswdWindow::~PasswdWindow()

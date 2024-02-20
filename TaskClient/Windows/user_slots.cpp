@@ -188,6 +188,7 @@ void UserWindow::clear_fields()
     ui->leTaskName->clear();
     ui->leDeadLine->clear();
     ui->leDescription->clear();
+    ui->leFullname->clear();
 
     ui->tvTasks->clearSelection();
 }

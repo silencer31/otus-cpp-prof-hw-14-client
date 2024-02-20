@@ -929,7 +929,7 @@
      </font>
     </property>
     <property name="text">
-     <string>User Fullname</string>
+     <string>Appointed to</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leFullname">
