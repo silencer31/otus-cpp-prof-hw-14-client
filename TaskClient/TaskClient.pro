@@ -14,6 +14,10 @@ win32 {
     LIBS += "-LD:\Boost\Shared\lib"
 } else {
 # All other platforms.
+	LIBS += \
+		-lboost_system\
+		-lboost_filesystem\
+		-lboost_thread
 }
 
 SOURCES += \
